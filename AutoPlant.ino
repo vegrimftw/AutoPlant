@@ -7,34 +7,7 @@
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
-/*...............README............................................................................
-
-  Everything inside "Adjustable Variables" can be changed as pleased.
-
-  1. Calibration is required and should be started by commenting out the pump trigger IF statement (line 436-440) *!*!*!*
-     This will avoid accidental triggering of the pump. Or just not have the pump connected to the relay yet. 
-
-  2. mapHi and mapLo is the sensor calibration borders. The analog input range is 0-1023, but the soil sensor
-     does not use the entire range (approx 510-200). It should be good, but check and make changes if needed. 
-  
-  3. -The "seconds" variable is the failsafe timer. Default is 30s, but should be changed based on pump effect.
-     -The manual variable is how long the pump should run if manually activated. Change it to own preference. 
-
-  4. The serial input section of the code is for writing instructions to the Arduino while it's running. 
-     To make these changes, in the serial monitor simply write this:
-
-      To change the:
-        timer value,   write this: timer xy
-        trigger value, write this: trigger xy
-        manual value,  write this: manual xy
-      xy = number, then press ENTER button to send the command. For example: "trigger 45"
-
-      The pump can also be started the same way, simply write this:  
-        Turn ON : pump on
-        Turn OFF: pump off
-
-
-*///..................User Adjustable Variables..........................................
+//..................User Adjustable Variables..........................................
 
   // Pump triggers
   int triggerStart     = 40;              // This % will trigger the pump 
@@ -45,11 +18,11 @@ DHT dht(DHTPIN, DHTTYPE);
   int tempLo           = 22;              // Blue blink - Too cold 
 
   // Misc
-  int clicks           = 4;               // How long to long press button 
+  int hold             = 4;               // Long press (seconds) 
  
   // Soil scaling                                             
   int mapHi            = 500;             // Upper limit raw (dry ~ 510+) [1023]  
-  int mapLo            = 180;             // Lower limit raw (wet ~ 200-) [0]    
+  int mapLo            = 180;             // Lower limit raw (wet ~ 180-) [0]    
 
   // Time(r) 
   int seconds          = 30;              // Pump stops after X seconds  
@@ -66,7 +39,7 @@ DHT dht(DHTPIN, DHTTYPE);
 
   const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 7;  // LCD 
   const int Pump        = 8;
-  const int Button      = 10;      
+  const int button      = 10;      
   const int LED_Red     = 14;     
   const int LED_Green   = 15;   
   const int LED_Blue    = 16;   
@@ -370,7 +343,7 @@ delay(100); // limits the code cycle to ~10Hz
 
 //...................Button functions....................................................
 
-  click = digitalRead(Button);
+  click = digitalRead(button);
 
   if (click == HIGH) 
   {
@@ -378,10 +351,10 @@ delay(100); // limits the code cycle to ~10Hz
     delay(1000);
     lcd.clear();
     
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 10; i++) {
       readAndDisplayData();
-      clickStatus[i] = digitalRead(Button) == HIGH ? 1 : 0;
-      delay(750);
+      clickStatus[i] = digitalRead(button) == HIGH ? 1 : 0;
+      delay(1000);
     }
     
     totalClick = 0;
@@ -391,9 +364,18 @@ delay(100); // limits the code cycle to ~10Hz
     
     soil = (soil1 + soil2) / 2;
     
-    if (totalClick > clicks && soil <= safetyLim) {
+    if (totalClick > hold && soil <= safetyLim) {
       startWatering();
     }
+  }
+
+  int up   = digitalRead(buttonUp);
+  int down = digitalRead(buttonDown); 
+
+  if (up == HIGH) {
+    triggerStart = triggerStart + 1; 
+  } else if (down == HIGH) {
+    triggerStart = triggerStart - 1; 
   }
 
 //...................Serial Input........................................................
@@ -731,7 +713,7 @@ void startWatering()
 
     digitalWrite(Pump, HIGH);
 
-    if (digitalRead(Button) == HIGH) 
+    if (digitalRead(button) == HIGH) 
     {
       digitalWrite(Pump, LOW);
       return;
