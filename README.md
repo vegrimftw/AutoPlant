@@ -15,7 +15,7 @@ Takes care of plants or whatever for people who can't maintain one by themselves
   4. -The "seconds" variable is the failsafe timer. Default is 30s, but should be changed based on pump effect.
      -The manual variable is how long the pump should run if manually activated. Change it to own preference. 
 
-  5. The serial input section of the code is for writing instructions to the Arduino while it's running. 
+  5. The serial input section of the code is for writing instructions to the Arduino while it's running.* 
      To change the:
      timer value,   write this: timer xy
      trigger value, write this: trigger xy
@@ -23,7 +23,9 @@ Takes care of plants or whatever for people who can't maintain one by themselves
      xy = number, then press ENTER button to send the command. For example: "trigger 45"
 
      The pump can also be started the same way, simply write this:  
-     "pump on" or "pump off" 
+     "pump on" or "pump off"
+
+     * Serial input only works if the Arduino is battery powered or powered by something else than USB. 
 
 Inputs/Outputs is entirely up to you, this is just how I ended up doing this. I encrourage you to clean the io's and code up a bit. 
 I used two sensors as just one proved to be somewhat unreliable at times. 
