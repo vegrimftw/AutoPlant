@@ -4,16 +4,18 @@ Takes care of plants or whatever for people who can't maintain one by themselves
 
   Everything inside "Adjustable Variables" can be changed as pleased.
 
-  1. Calibration is required and should be started by commenting out the pump trigger IF statement (line 480-484) *!*!*!*
+  1. Install libraries (DHT11/22, LCD and elapsedMillis). 
+
+  2. Calibration is required and should be started by commenting out the pump trigger IF statement (line 480-484) *!*!*!*
      This will avoid accidental triggering of the pump. Or just not have the pump connected to the relay yet. 
 
-  2. mapHi and mapLo is the sensor calibration borders. The analog input range is 0-1023, but the soil sensor
+  3. mapHi and mapLo is the sensor calibration borders. The analog input range is 0-1023, but the soil sensor
      does not use the entire range (approx 510-200). It should be good, but check and make changes if needed. 
   
-  3. -The "seconds" variable is the failsafe timer. Default is 30s, but should be changed based on pump effect.
+  4. -The "seconds" variable is the failsafe timer. Default is 30s, but should be changed based on pump effect.
      -The manual variable is how long the pump should run if manually activated. Change it to own preference. 
 
-  4. The serial input section of the code is for writing instructions to the Arduino while it's running. 
+  5. The serial input section of the code is for writing instructions to the Arduino while it's running. 
      To make these changes, in the serial monitor simply write this:
 
       To change the:
