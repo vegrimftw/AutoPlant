@@ -38,7 +38,7 @@ DHT dht(DHTPIN, DHTTYPE);
   int triggerstart;                       // Used for serial input
 
   const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 7;  // LCD 
-  const int Pump        = 8;
+  const int pump        = 8;
   const int button      = 10;      
   const int LED_Red     = 14;     
   const int LED_Green   = 15;   
@@ -146,7 +146,7 @@ void setup() {
     pinMode(A2,  INPUT);  // Soil sensor 2
     pinMode(A3, OUTPUT);  // Button Up
 
-    digitalWrite(Pump, LOW);  // Just because 
+    digitalWrite(pump, LOW);  // Just because 
 
     lcd.createChar(1, celcius);
     lcd.createChar(2, smiley);
@@ -448,13 +448,13 @@ delay(100); // limits the code cycle to ~10Hz
 
       else if (command == "pump on") 
       {
-        digitalWrite(Pump, HIGH);
+        digitalWrite(pump, HIGH);
         Serial.println("Pump is ON");
       } 
 
       else if (command == "pump off") 
       {
-        digitalWrite(Pump, LOW);
+        digitalWrite(pump, LOW);
         Serial.println("Pump is OFF");
       } 
     }
@@ -465,7 +465,7 @@ delay(100); // limits the code cycle to ~10Hz
 
   if ((soil1 < (triggerStart + 5)) && (soil2 < (triggerStart + 5)) && (averageSoil < triggerStart) && (averageSoil > lowerLim) && (avgDeltaSoil < 0.01))  
   {
-    digitalWrite(Pump, HIGH);  
+    digitalWrite(pump, HIGH);  
     delay(50); 
   }
 
@@ -473,16 +473,16 @@ delay(100); // limits the code cycle to ~10Hz
 
   if ((averageSoil < lowerLim) || (averageSoil > triggerStop) || ((soil1 > triggerStop) & (soil2 > triggerStop)))           
   {
-    digitalWrite(Pump, LOW);
+    digitalWrite(pump, LOW);
   }
     
   // If pump is ON for more than x seconds, pump turns OFF 
 
-  if (digitalRead(Pump) == HIGH) 
+  if (digitalRead(pump) == HIGH) 
   {  
      if (timeElapsed > timer)   // Timer starts counting 
      {
-      digitalWrite(Pump, LOW); 
+      digitalWrite(pump, LOW); 
       return; 
      }
   }
@@ -544,7 +544,7 @@ delay(100); // limits the code cycle to ~10Hz
 
 //...................Print sensor data to LCD............................................
   
-  if (digitalRead(Pump) == HIGH) 
+  if (digitalRead(pump) == HIGH) 
   {
     lcd.clear(); 
     lcd.setCursor(0, 0);  // 
@@ -711,14 +711,14 @@ void startWatering()
     Serial.print(F("%  - "));
     Serial.println(i);
 
-    digitalWrite(Pump, HIGH);
+    digitalWrite(pump, HIGH);
 
     if (digitalRead(button) == HIGH) 
     {
-      digitalWrite(Pump, LOW);
+      digitalWrite(pump, LOW);
       return;
     }
   }
-  digitalWrite(Pump, LOW);
+  digitalWrite(pump, LOW);
 }
 
