@@ -1,5 +1,5 @@
 # AutoPlant
-Takes care of plants or whatever for people with adhd 
+Takes care of plants or whatever for people who can't maintain one by themselves (like me).  
 
 
   Everything inside "Adjustable Variables" can be changed as pleased.
@@ -27,4 +27,6 @@ Takes care of plants or whatever for people with adhd
         Turn OFF: pump off
 
 Inputs/Outputs is entirely up to you, this is just how I ended up doing this. I encrourage you to clean the io's and code up a bit. 
+I used two sensors as just one proved to be somewhat unreliable at times. 
+
 I've used this project for learning and have moved on to other projects, so this will rarely be updated. 
