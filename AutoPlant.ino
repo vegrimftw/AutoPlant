@@ -374,8 +374,11 @@ delay(100); // limits the code cycle to ~10Hz
 
   if (up == HIGH) {
     triggerStart = triggerStart + 1; 
-  } else if (down == HIGH) {
+    delay (100);   // avoids multiple inputs 
+  } 
+  else if (down == HIGH) {
     triggerStart = triggerStart - 1; 
+    delay (100); 
   }
 
 //...................Serial Input........................................................
