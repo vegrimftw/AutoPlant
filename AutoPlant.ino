@@ -28,33 +28,33 @@ DHT dht(DHTPIN, DHTTYPE);
   int seconds          = 30;              // Pump stops after X seconds  
   int manual           = 15;              // Timer for manual start of pump 
 
-//...................Variables & Constants...............................................
+//...................Inputs/Outputs & Variable...........................................
 
   elapsedMillis timeElapsed;
-  unsigned int interval = 1000;   // Timer variable, don't touch
+  unsigned int interval = 1000;    // Timer variable, don't touch
 
   // Input/Output pins
 
-  int triggerstart;                       // Used for serial input
-
   const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 7;  // LCD 
-  const int pump        = 8;
-  const int button      = 10;      
-  const int LED_Red     = 14;     
-  const int LED_Green   = 15;   
-  const int LED_Blue    = 16;   
-  const int soil1       = A0; 
-  const int buttonDown  = A1;
-  const int soil2       = A2; 
-  const int buttonUp    = A3;    
-  const int toggle_01   = A4; 
-  const int toggle_02   = A5; 
+  const int pump          = 8;
+  //        DHT Sensor    = 9;
+  const int button        = 10;      
+  const int LED_Red       = 14;    // Arduino Uno: 11
+  const int LED_Green     = 15;    // Arduino Uno: 12
+  const int LED_Blue      = 16;    // Arduino Uno: 13
+  const int soil1         = A0; 
+  const int buttonDown    = A1;
+  const int soil2         = A2; 
+  const int buttonUp      = A3;    
+  const int toggleSwitch  = A4;    // UNO
+  const int spare         = A5;    // UNO
   
   // Random variables 
 
   int click = 0;
   int totalClick;
   int clickStatus[12];
+  int triggerstart;                // Used for serial input
 
   int prevSoil;
   int newSoil;
@@ -129,7 +129,7 @@ DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
 
-  //...................Pin Mode............................................................
+  //...................Pin Mode..........................................................
 
     Serial.begin(9600);   // This starts the serial port communication 
 
@@ -153,51 +153,26 @@ void setup() {
     lcd.begin(16, 2);
 
 
-  //...................Startup procedure to let capacitors charge up.......................
+  //...................Startup procedure.................................................
 
     Serial.println(F(" AutoPlant - For forgetful/lazy people"));
-    delay(2000);
-
-    Serial.println(F("Initializing..."));
-
-    // Test each LED color on startup 
-
-    digitalWrite(LED_Red,   HIGH);
-    lcd.print(" AutoWater  ");
-    lcd.setCursor(12, 0);
-    lcd.print("for ");
+    Serial.println(F(" Initializing..."));
+    lcd.print(" AutoWater for  ");
+    lcd.setCursor(0, 1);
+    lcd.print("Forgetful people");
+    digitalWrite(LED_Red,   HIGH);       // Test each LED color on startup 
     delay(1000);
     digitalWrite(LED_Red,    LOW);
     digitalWrite(LED_Green, HIGH);
     delay(1000);
-    lcd.setCursor(0, 1);
-    lcd.print("Forgetful people");
     digitalWrite(LED_Green,  LOW);
     digitalWrite(LED_Blue,  HIGH);
     delay(1000);
     digitalWrite(LED_Blue,   LOW);
-    delay(250);
+    delay(500);
 
-    if (toggle_02 == HIGH)              // Two soil sensors - two white blinks at startup
+    if (toggleSwitch == HIGH)            // One soil sensor - One white blink at startup
     {      
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,  HIGH);
-      digitalWrite(LED_Red,   HIGH); 
-      delay (500);
-      digitalWrite(LED_Green,  LOW);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,    LOW); 
-      delay (500);
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,  HIGH);
-      digitalWrite(LED_Red,   HIGH); 
-      delay (500);
-      digitalWrite(LED_Green,  LOW);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,    LOW); 
-    } 
-    else if (toggle_01 == HIGH)         // One soil sensor - One white blink at startup 
-    {
       digitalWrite(LED_Green, HIGH);
       digitalWrite(LED_Blue,  HIGH);
       digitalWrite(LED_Red,   HIGH); 
@@ -205,12 +180,30 @@ void setup() {
       digitalWrite(LED_Green,  LOW);
       digitalWrite(LED_Blue,   LOW);
       digitalWrite(LED_Red,    LOW); 
+    } 
+    else                                 // Two soil sensors - Two white blinks at startup 
+    {
+      digitalWrite(LED_Green, HIGH);
+      digitalWrite(LED_Blue,  HIGH);
+      digitalWrite(LED_Red,   HIGH); 
+      delay (500);
+      digitalWrite(LED_Green,  LOW);
+      digitalWrite(LED_Blue,   LOW);
+      digitalWrite(LED_Red,    LOW); 
+      delay (500);
+      digitalWrite(LED_Green, HIGH);
+      digitalWrite(LED_Blue,  HIGH);
+      digitalWrite(LED_Red,   HIGH); 
+      delay (500);
+      digitalWrite(LED_Green,  LOW);
+      digitalWrite(LED_Blue,   LOW);
+      digitalWrite(LED_Red,    LOW); 
     }
     lcd.clear(); 
-    Serial.println(F("Initialized."));
+    Serial.println(F(" Initialized."));
 }
 
-//...............PROGRAM...........................................................................
+//...............LOOP..............................................................................
 
 void loop()     
 {  
@@ -247,15 +240,15 @@ delay(100); // limits the code cycle to ~10Hz
   int analogAverage;
   int soil;
 
-  if (toggle_02 == HIGH)              // Two soil sensors
+  if (toggleSwitch == HIGH)           // One soil sensor
   {      
-    analogAverage = (analogRead(A1) + analogRead(A2)) / 2; 
-    soil = (soil1 + soil2) / 2; 
-  } 
-  else if (toggle_01 == HIGH)         // One soil sensor
-  {
     analogAverage = analogRead(A1); 
     soil = soil1; 
+  } 
+  else                                // Two soil sensors
+  {
+    analogAverage = (analogRead(A1) + analogRead(A2)) / 2; 
+    soil = (soil1 + soil2) / 2; 
   }
 
   // dx/dt    -   This derives the rate of change of input signal(s) to prevent eratic values 
@@ -345,8 +338,7 @@ delay(100); // limits the code cycle to ~10Hz
 
   click = digitalRead(button);
 
-  if (click == HIGH) 
-  {
+  if (click == HIGH) {
     displayMessage(" Hold button to ", " start watering ");
     delay(1000);
     lcd.clear();
@@ -376,7 +368,7 @@ delay(100); // limits the code cycle to ~10Hz
     triggerStart = triggerStart + 1; 
     delay (100);   // avoids multiple inputs 
   } 
-  else if (down == HIGH) {
+  if (down == HIGH) {
     triggerStart = triggerStart - 1; 
     delay (100); 
   }
@@ -389,8 +381,7 @@ delay(100); // limits the code cycle to ~10Hz
       String command = Serial.readStringUntil('\n');
       command.trim(); // Trim whitespace and newline characters
 
-      if (command.startsWith("timer ")) 
-      {
+      if (command.startsWith("timer ")) {
         String numberString = command.substring(6); // Extract number part after "timer "
         int newSeconds = numberString.toInt(); // Convert to integer
 
@@ -409,8 +400,7 @@ delay(100); // limits the code cycle to ~10Hz
 
     // ...Trigger edit... 
 
-      if (command.startsWith("trigger ")) 
-      {
+      if (command.startsWith("trigger ")) {
         String numberString = command.substring(8); // Extract number part after "trigger "
         int newManual = numberString.toInt(); // Convert to integer
 
@@ -429,8 +419,7 @@ delay(100); // limits the code cycle to ~10Hz
 
     // ...Trigger edit... 
 
-      if (command.startsWith("manual ")) 
-      {
+      if (command.startsWith("manual ")) {
         String numberString = command.substring(7); // Extract number part after "manual "
         int newTrigger = numberString.toInt(); // Convert to integer
 
@@ -449,14 +438,12 @@ delay(100); // limits the code cycle to ~10Hz
     
     // ...Manual Pump trigger...
 
-      else if (command == "pump on") 
-      {
+      else if (command == "pump on") {
         digitalWrite(pump, HIGH);
         Serial.println("Pump is ON");
       } 
 
-      else if (command == "pump off") 
-      {
+      else if (command == "pump off") {
         digitalWrite(pump, LOW);
         Serial.println("Pump is OFF");
       } 
@@ -493,18 +480,18 @@ delay(100); // limits the code cycle to ~10Hz
 
 //...................LED.................................................................
 
-  if (averageTemp < tempLo)                      // If temp is below 22 degrees - blue blink (2Hz)
-  {                                              
-  digitalWrite(LED_Green,  LOW);
-  digitalWrite(LED_Blue,   (millis() / 500) % 2); 
-  digitalWrite(LED_Red,    LOW);     
+  if (averageTemp < tempLo)                      // If temp is below 22 degrees - blue blink (2Hz)                                              
+  {
+    digitalWrite(LED_Green,  LOW);
+    digitalWrite(LED_Blue,   (millis() / 500) % 2); 
+    digitalWrite(LED_Red,    LOW);     
   }
 
   else if (averageTemp > tempHi)                 // If temp is above 28 degrees - red/yellow blink (2Hz)
   {
-  digitalWrite(LED_Green,  (millis() / 500) % 2);  
-  digitalWrite(LED_Blue,   LOW);    
-  digitalWrite(LED_Red,   HIGH);     
+    digitalWrite(LED_Green,  (millis() / 500) % 2);  
+    digitalWrite(LED_Blue,   LOW);    
+    digitalWrite(LED_Red,   HIGH);     
   } 
 
   else {                                         // Temperature is good. LED indicates soil moisture status
@@ -639,6 +626,8 @@ delay(100); // limits the code cycle to ~10Hz
   Serial.println(timeElapsed);            // ln (line) is basically the enter-button
 
 }
+
+//...............FUNCTIONS.........................................................................
 
 void displayMessage(const char* line1, const char* line2) 
 {
