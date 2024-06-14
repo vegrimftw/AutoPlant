@@ -18,11 +18,12 @@ DHT dht(DHTPIN, DHTTYPE);
   int tempLo           = 22;              // Blue blink - Too cold 
 
   // Misc
-  int hold             = 4;               // Long press (seconds) 
+  int hold             = 3;               // Long press (seconds) 
+  int wateringDuration = 30;              // Manual watering duration [seconds]
  
   // Soil scaling                                             
-  int mapHi            = 500;             // Upper limit raw (dry ~ 510+) [1023]  
-  int mapLo            = 180;             // Lower limit raw (wet ~ 180-) [0]    
+  int mapLo            = 165;             // Lower limit raw (wet ~ 180-) [0]    
+  int mapHi            = 510;             // Upper limit raw (dry ~ 520+) [1023] 
 
   // Time(r) 
   int seconds          = 30;              // Pump stops after X seconds  
@@ -46,8 +47,8 @@ DHT dht(DHTPIN, DHTTYPE);
   const int buttonDown    = A1;
   const int soil2         = A2; 
   const int buttonUp      = A3;    
-  const int toggleSwitch  = A4;    // UNO (Not used)
-  const int spare         = A5;    // UNO (Not used)
+  const int toggleSwitch  = A4;    // UNO
+  const int spare         = A5;    // UNO
   
   // Random variables 
 
@@ -142,12 +143,12 @@ void setup() {
     pinMode(15, OUTPUT);  // LED Green
     pinMode(16, OUTPUT);  // LED Blue
     pinMode(A0,  INPUT);  // Soil Sensor 1
-    pinMode(A1,  INPUT);  // Button Down
-    pinMode(A2,  INPUT);  // Soil Sensor 2
-    pinMode(A3,  INPUT);  // Button Up
+    pinMode(A1, OUTPUT);  // Button Down
+    pinMode(A2,  INPUT);  // Soil sensor 2
+    pinMode(A3, OUTPUT);  // Button Up
     pinMode(A4,  INPUT);  // Toggle Button
     pinMode(A5, OUTPUT);  // Spare (Pump 2?) 
-  
+
     digitalWrite(pump, LOW);  // Just because 
 
     lcd.createChar(1, celcius);
@@ -689,42 +690,49 @@ void readAndDisplayData()
   lcd.write(3);
 }
 
-void startWatering() 
-{
-  digitalWrite(LED_Red,    LOW);
-  digitalWrite(LED_Blue,  HIGH);
+void startWatering() {
+  const int checkInterval = 1000; // interval to check button and update display in milliseconds
+  const unsigned long endTime = millis() + (wateringDuration * 1000);
+
+  digitalWrite(LED_Red, LOW);
+  digitalWrite(LED_Blue, HIGH);
   digitalWrite(LED_Green, HIGH);
   lcd.clear();
   Serial.println(F("Watering now!"));
   lcd.setCursor(1, 0);
   lcd.print("Watering now!");
 
-  for (int i = 20; i > 9; i--) {
+  while (millis() < endTime) {
     int soiling = (map(analogRead(A0), mapLo, mapHi, 100, 0) + map(analogRead(A2), mapLo, mapHi, 100, 0)) / 2;
+
     lcd.setCursor(1, 1);
     lcd.print("Soil:");
     lcd.setCursor(7, 1);
     lcd.print(soiling);
     lcd.setCursor(9, 1);
     lcd.print("%");
+
+    unsigned long remainingTime = (endTime - millis()) / 1000;
     lcd.setCursor(11, 1);
     lcd.print(" ");
     lcd.setCursor(12, 1);
-    lcd.print(i);
+    lcd.print(remainingTime);
+    lcd.setCursor(14, 1);
+    lcd.print("s");
 
     Serial.print(F("-Soil "));
     Serial.print(soiling);
     Serial.print(F("%  - "));
-    Serial.println(i);
+    Serial.println(remainingTime);
 
-    digitalWrite(pump, HIGH);
+    digitalWrite(Pump, HIGH);
 
-    if (digitalRead(button) == HIGH) 
-    {
-      digitalWrite(pump, LOW);
+    // Check if the button is pressed to stop watering early
+    if (digitalRead(Button) == HIGH) {
+      digitalWrite(Pump, LOW);
       return;
     }
+
+    delay(checkInterval); // wait for checkInterval before updating again
   }
-  digitalWrite(pump, LOW);
-}
 
