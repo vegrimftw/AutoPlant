@@ -46,8 +46,8 @@ DHT dht(DHTPIN, DHTTYPE);
   const int buttonDown    = A1;
   const int soil2         = A2; 
   const int buttonUp      = A3;    
-  const int toggleSwitch  = A4;    // UNO
-  const int spare         = A5;    // UNO
+  const int toggleSwitch  = A4;    // UNO (Not used)
+  const int spare         = A5;    // UNO (Not used)
   
   // Random variables 
 
@@ -141,11 +141,13 @@ void setup() {
     pinMode(14, OUTPUT);  // LED Red
     pinMode(15, OUTPUT);  // LED Green
     pinMode(16, OUTPUT);  // LED Blue
-    pinMode(A0,  INPUT);  // Soil Sensor
-    pinMode(A1, OUTPUT);  // Button Down
-    pinMode(A2,  INPUT);  // Soil sensor 2
-    pinMode(A3, OUTPUT);  // Button Up
-
+    pinMode(A0,  INPUT);  // Soil Sensor 1
+    pinMode(A1,  INPUT);  // Button Down
+    pinMode(A2,  INPUT);  // Soil Sensor 2
+    pinMode(A3,  INPUT);  // Button Up
+    pinMode(A4,  INPUT);  // Toggle Button
+    pinMode(A5, OUTPUT);  // Spare (Pump 2?) 
+  
     digitalWrite(pump, LOW);  // Just because 
 
     lcd.createChar(1, celcius);
