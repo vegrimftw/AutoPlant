@@ -366,11 +366,23 @@ delay(100); // limits the code cycle to ~10Hz
 
   if (up == HIGH) {
     triggerStart = triggerStart + 1; 
-    delay (100);   // avoids multiple inputs 
+    lcd.setCursor(0, 0);
+    lcd.print("Pump trigger:");
+    lcd.setCursor(13, 0);
+    lcd.print(triggerStart);
+    lcd.setCursor(15, 1);
+    lcd.print("%");
+    delay (750);   // avoids multiple inputs 
   } 
   if (down == HIGH) {
     triggerStart = triggerStart - 1; 
-    delay (100); 
+    lcd.setCursor(0, 0);
+    lcd.print("Pump trigger:");
+    lcd.setCursor(13, 0);
+    lcd.print(triggerStart);
+    lcd.setCursor(15, 1);
+    lcd.print("%");
+    delay (750); 
   }
 
 //...................Serial Input........................................................
@@ -453,7 +465,7 @@ delay(100); // limits the code cycle to ~10Hz
 
   // Pump will start if both sensors and the average value are below certain value (triggerStart)
 
-  if ((soil1 < (triggerStart + 5)) && (soil2 < (triggerStart + 5)) && (averageSoil < triggerStart) && (averageSoil > lowerLim) && (avgDeltaSoil < 0.01))  
+  if ((soil1 < (triggerStart + 5)) && (soil2 < (triggerStart + 5)) && (averageSoil <= triggerStart) && (averageSoil > lowerLim) && (avgDeltaSoil < 0.01))  
   {
     digitalWrite(pump, HIGH);  
     delay(50); 
