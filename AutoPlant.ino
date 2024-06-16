@@ -113,19 +113,6 @@ DHT dht(DHTPIN, DHTTYPE);
     B00000,
   };
 
-  byte smiley[8] = 
-  {
-    B00000,
-    B01010,
-    B01010,
-    B00000,
-    B10001,
-    B01110,
-    B00000,
-    B00000,
-  };
-
-
 //...............SETUP.............................................................................
 
 void setup() {
@@ -152,7 +139,6 @@ void setup() {
     digitalWrite(pump, LOW);  // Just because 
 
     lcd.createChar(1, celcius);
-    lcd.createChar(2, smiley);
     lcd.begin(16, 2);
 
 
