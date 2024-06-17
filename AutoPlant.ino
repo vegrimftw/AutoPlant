@@ -59,14 +59,16 @@ DHT dht(DHTPIN, DHTTYPE);
 
   int prevSoil;
   int newSoil;
-
   double dxSoil;
   double deltaSoil;
   double prevSoilRaw;
   double newSoilRaw;
   double previousTime;
   double newTime;
-
+  double previousTime2;
+  double newTime2;
+  int buttonPressStartTime = 0;
+  bool buttonHeldLongEnough = false;
 
 //...................Average for-loops...................................................
 
@@ -336,6 +338,17 @@ delay(100); // limits the code cycle to ~10Hz
     // Calculate the average Humidity value
     float averageHI = totalHi / numReadings4;
 
+  // dS/dt - detects changing value, avoids triggering when counting on startup
+
+    int deltaSoil =  averageSoil; // int analogAverage = analogRead(A0); if only one sensor used !
+
+    prevSoil = newSoil;  // Saves soil level read from previous cycle
+    newSoil = deltaSoil;
+
+    previousTime2 = newTime2;    // Saves the time of the previous cycle
+    newTime2 = millis();        // Filling up/down(+/-)  /  cycle runtime  -  (millis() / 100)
+
+    float dsdt = abs((newSoil - prevSoil) / (newTime2 - previousTime2));
 
 //...................Button functions....................................................
 
@@ -474,7 +487,7 @@ delay(100); // limits the code cycle to ~10Hz
 
   // Pump will start if both sensors and the average value are below certain value (triggerStart)
 
-  if ((soil1 < (triggerStart + 5)) && (soil2 < (triggerStart + 5)) && (averageSoil <= triggerStart) && (averageSoil > lowerLim) && (avgDeltaSoil < 0.01))  
+  if ((soil1 <= (triggerStart + 5)) && (soil2 <= (triggerStart + 5)) && (averageSoil <= triggerStart) && (averageSoil > lowerLim) && (dsdt < 0.001) && (avgDeltaSoil < 0.01)) 
   {
     digitalWrite(pump, HIGH);  
     delay(50); 
@@ -545,7 +558,7 @@ delay(100); // limits the code cycle to ~10Hz
       digitalWrite(LED_Red,    (millis() / 333) % 2);  
     }
 
-    else if ((averageSoil) < 0 || (averageSoil > 100))                 // Sensor scaling is wrong, purple blink (2Hz)
+    else if ((averageSoil) < 0 || (averageSoil > 100))                 // Calibration error, purple blink (2Hz)
     {
       digitalWrite(LED_Green,    LOW); 
       digitalWrite(LED_Blue,     (millis() / 500) % 2); 
