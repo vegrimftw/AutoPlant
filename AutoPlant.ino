@@ -18,12 +18,12 @@ DHT dht(DHTPIN, DHTTYPE);
   int tempLo           = 22;              // Blue blink - Too cold 
 
   // Misc
-  int hold             = 3;               // Long press (seconds) 
+  int longPress         = 3;              // Long press (seconds) 
   int wateringDuration = 30;              // Manual watering duration [seconds]
  
   // Soil scaling                                             
-  int mapLo            = 165;             // Lower limit raw (wet ~ 180-) [0]    
-  int mapHi            = 510;             // Upper limit raw (dry ~ 520+) [1023] 
+  int mapLo           = 165;              // Lower limit raw (wet ~ 180-) [0]    
+  int mapHi           = 510;              // Upper limit raw (dry ~ 520+) [1023] 
 
   // Time(r) 
   int seconds          = 30;              // Pump stops after X seconds  
@@ -113,6 +113,19 @@ DHT dht(DHTPIN, DHTTYPE);
     B00000,
   };
 
+  byte smiley[8] = 
+  {
+    B00000,
+    B01010,
+    B01010,
+    B00000,
+    B10001,
+    B01110,
+    B00000,
+    B00000,
+  };
+
+
 //...............SETUP.............................................................................
 
 void setup() {
@@ -139,6 +152,7 @@ void setup() {
     digitalWrite(pump, LOW);  // Just because 
 
     lcd.createChar(1, celcius);
+    lcd.createChar(2, smiley);
     lcd.begin(16, 2);
 
 
@@ -333,19 +347,25 @@ delay(100); // limits the code cycle to ~10Hz
     lcd.clear();
     
     for (int i = 0; i < 10; i++) {
-      readAndDisplayData();
-      clickStatus[i] = digitalRead(button) == HIGH ? 1 : 0;
-      delay(1000);
+    readAndDisplayData();           // Displays raw data to the user for 10s 
+
+    if (digitalRead(button) == HIGH) {
+      clickStatus[i] = 1;
+    } else {
+      clickStatus[i] = 0;
     }
-    
+    delay(1000); // 1 second delay
+  }
+  
     totalClick = 0;
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 10; i++) {
       totalClick += clickStatus[i];
     }
+  
+    soil = (soil1 + soil2) / 2; // Average soil moisture
     
-    soil = (soil1 + soil2) / 2;
-    
-    if (totalClick > hold && soil <= safetyLim) {
+    // Check if the button was held down for longPress seconds continuously
+    if (totalClick >= longPress && soil <= safetyLim) {
       startWatering();
     }
   }
@@ -711,14 +731,16 @@ void startWatering() {
     Serial.print(F("%  - "));
     Serial.println(remainingTime);
 
-    digitalWrite(Pump, HIGH);
+    digitalWrite(pump, HIGH);
 
     // Check if the button is pressed to stop watering early
-    if (digitalRead(Button) == HIGH) {
-      digitalWrite(Pump, LOW);
+    if (digitalRead(button) == HIGH) {
+      digitalWrite(pump, LOW);
       return;
     }
 
     delay(checkInterval); // wait for checkInterval before updating again
   }
 
+  digitalWrite(pump, LOW);
+}
