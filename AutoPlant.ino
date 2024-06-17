@@ -650,14 +650,14 @@ delay(100); // limits the code cycle to ~10Hz
   Serial.print(F(",  A2_Raw: "));         // Raw soil sensor data 2
   Serial.print(analogRead(A2));
 
-  Serial.print(F(",  Trigger value: "));  // Average rate of change of soil sensor
+  Serial.print(F(",  Trigger value: "));  // Trigger value [%]
   Serial.print(triggerStart);
 
-  Serial.print(F(",  Timer: "));          // Average rate of change of soil sensor
+  Serial.print(F(",  Timer: "));          // Emergency cut-off timer for pump
   Serial.print(seconds);
 
   Serial.print(F(", - Elapsed time: "));  // Cut-off counter for pump 
-  Serial.println(timeElapsed);            // ln (line) is basically the enter-button
+  Serial.println(timeElapsed);            // ln = new line (enter) 
 
 }
 
