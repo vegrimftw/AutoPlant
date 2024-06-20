@@ -18,7 +18,7 @@ DHT dht(DHTPIN, DHTTYPE);
   int tempLo           = 22;              // Blue blink - Too cold 
 
   // Misc
-  int longPress         = 5;              // Long press (seconds) 
+  int longPress         = 3;              // Long press (seconds) 
   int wateringDuration = 30;              // Manual watering duration [seconds]
  
   // Soil scaling                                             
@@ -26,8 +26,8 @@ DHT dht(DHTPIN, DHTTYPE);
   int mapHi           = 510;              // Upper limit raw (dry ~ 510+) [1023] 
 
   // Time(r) 
-  int seconds          = 30;              // Pump stops after X seconds  
-  int manual           = 15;              // Timer for manual start of pump 
+  int seconds          = 45;              // Pump stops after X seconds  
+  int manual           = 30;              // Timer for manual start of pump 
 
 //...................Inputs/Outputs & Variable...........................................
 
