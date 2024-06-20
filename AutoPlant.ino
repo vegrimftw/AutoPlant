@@ -632,10 +632,6 @@ delay(100); // limits the code cycle to ~10Hz
       lcd.print("No sensors found");
       lcd.setCursor(0, 1);
       lcd.print(" *Manual Mode*  ");
-
-      digitalWrite(LED_Green,    LOW);
-      digitalWrite(LED_Blue,     (millis() / 2000) % 2);
-      digitalWrite(LED_Red,      (millis() / 2000) % 2);
     } 
     else                                         // Soil Sensor Working
     { 
