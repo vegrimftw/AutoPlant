@@ -26,7 +26,7 @@ DHT dht(DHTPIN, DHTTYPE);
   int mapHi           = 510;              // Upper limit raw (dry ~ 520+) [1023] 
 
   // Time(r) 
-  int seconds          = 30;              // Pump stops after X seconds  
+  int seconds          = 45;              // Pump stops after X seconds  
   int manual           = 15;              // Timer for manual start of pump 
 
 //...................Inputs/Outputs & Variable...........................................
