@@ -897,21 +897,19 @@ void startWatering() {
   const int checkInterval = 1000; // interval to check button and update display in milliseconds
   const unsigned long endTime = millis() + (wateringDuration * 1000);
 
-  digitalWrite(LED_Red, LOW);
-  digitalWrite(LED_Blue, HIGH);
-  digitalWrite(LED_Green, HIGH);
+  tealLED();
   lcd.clear();
   Serial.println(F("Watering now!"));
   lcd.setCursor(1, 0);
   lcd.print("Watering now!");
 
   while (millis() < endTime) {
-    int soiling = (map(analogRead(A0), mapLo, mapHi, 100, 0) + map(analogRead(A2), mapLo, mapHi, 100, 0)) / 2;
+    int soilYo = (map(analogRead(A0), mapLo, mapHi, 100, 0) + map(analogRead(A2), mapLo, mapHi, 100, 0)) / 2;
 
     lcd.setCursor(0, 1);
     lcd.print("Soil:");
     lcd.setCursor(6, 1);
-    lcd.print(soiling);
+    lcd.print(soilYo);
     lcd.setCursor(8, 1);
     lcd.print("% ");
     lcd.setCursor(10, 1);
@@ -931,7 +929,7 @@ void startWatering() {
     lcd.print("s");
 
     Serial.print(F("-Soil "));
-    Serial.print(soiling);
+    Serial.print(soilYo);
     Serial.print(F("%  - "));
     Serial.println(remainingTime);
 
