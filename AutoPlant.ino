@@ -22,8 +22,8 @@ DHT dht(DHTPIN, DHTTYPE);
   int wateringDuration = 30;              // Manual watering duration [seconds]
  
   // Soil scaling                                             
-  int mapLo           = 165;              // Lower limit raw (wet ~ 180-) [0]    
-  int mapHi           = 510;              // Upper limit raw (dry ~ 520+) [1023] 
+  int mapLo           = 180;              // Lower limit raw (wet ~ 180-) [0]    
+  int mapHi           = 510;              // Upper limit raw (dry ~ 510+) [1023] 
 
   // Time(r) 
   int seconds          = 30;              // Pump stops after X seconds  
