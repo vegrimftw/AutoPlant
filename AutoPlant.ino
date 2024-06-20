@@ -18,7 +18,7 @@ DHT dht(DHTPIN, DHTTYPE);
   int tempLo           = 22;              // Blue blink - Too cold 
 
   // Misc
-  int longPress         = 3;              // Long press (seconds) 
+  int longPress         = 5;              // Long press (seconds) 
   int wateringDuration = 30;              // Manual watering duration [seconds]
  
   // Soil scaling                                             
@@ -52,6 +52,7 @@ DHT dht(DHTPIN, DHTTYPE);
   
   // Random variables 
 
+  int y; 
   int click = 0;
   int totalClick;
   int clickStatus[12];
@@ -67,7 +68,6 @@ DHT dht(DHTPIN, DHTTYPE);
   double newTime;
   double previousTime2;
   double newTime2;
-  int buttonPressStartTime = 0;
   bool buttonHeldLongEnough = false;
 
 //...................Average for-loops...................................................
@@ -115,14 +115,50 @@ DHT dht(DHTPIN, DHTTYPE);
     B00000,
   };
 
-  byte smiley[8] = 
+  byte topLeft[8] = 
   {
     B00000,
-    B01010,
-    B01010,
     B00000,
-    B10001,
-    B01110,
+    B00000,
+    B00000,
+    B00001,
+    B00011,
+    B00110,
+    B01101,
+  };
+
+  byte topRight[8] = 
+  {
+    B00000,
+    B00000,
+    B10000,
+    B10000,
+    B10000,
+    B11000,
+    B01100,
+    B00110,
+  };
+
+  byte bottomLeft[8] = 
+  {
+    B01101,
+    B01100,
+    B00110,
+    B00011,
+    B00000,
+    B00000,
+    B00000,
+    B00000,
+  };
+
+  byte bottomRight[8] = 
+  {
+    B10110,
+    B00110,
+    B01100,
+    B11000,
+    B00000,
+    B00000,
     B00000,
     B00000,
   };
@@ -153,8 +189,11 @@ void setup() {
 
     digitalWrite(pump, LOW);  // Just because 
 
-    lcd.createChar(1, celcius);
-    lcd.createChar(2, smiley);
+    lcd.createChar(1, topLeft);
+    lcd.createChar(2, topRight);
+    lcd.createChar(3, bottomLeft);
+    lcd.createChar(4, bottomRight);
+    lcd.createChar(5, celcius);
     lcd.begin(16, 2);
 
 
@@ -218,6 +257,7 @@ delay(100); // limits the code cycle to ~10Hz
 //...................More Variables......................................................
 
   int timer      = interval * seconds;     // Timer for disabling the pump if ON too long
+  int yLoops     = longPress * 2;          // One for-loop is 500ms 
 
   // Limits 
   int safetyLim  = triggerStart * 1.5;     // Pump cannot be activated above this %
@@ -356,32 +396,58 @@ delay(100); // limits the code cycle to ~10Hz
 
   if (click == HIGH) {
     displayMessage(" Hold button to ", " start watering ");
+    buttonHeldLongEnough = false;
     delay(1000);
-    lcd.clear();
-    
-    for (int i = 0; i < 10; i++) {
-    readAndDisplayData();           // Displays raw data to the user for 10s 
+    lcd.clear();  
 
-    if (digitalRead(button) == HIGH) {
-      clickStatus[i] = 1;
-    } else {
-      clickStatus[i] = 0;
+    // Read and display data while checking if the button is held down
+    for (int i = 0; i < (20 - y); i++) {
+      readAndDisplayData();
+
+      if (digitalRead(button) == HIGH) {
+        lcd.setCursor(7, 0);  
+        lcd.write(1); 
+        lcd.setCursor(8, 0);  
+        lcd.write(2); 
+        lcd.setCursor(7, 1);  
+        lcd.write(3); 
+        lcd.setCursor(8, 1);  
+        lcd.write(4); 
+        delay(50); 
+
+        for (y = 0; y < yLoops; y++) {         
+          readAndDisplayData();
+          delay(420); 
+
+          if (y == (yLoops - 1)) {
+            buttonHeldLongEnough = true;
+            greenLED(); 
+            delay(250);
+            break;
+          }
+          
+          if (digitalRead(button) == LOW) {
+            buttonHeldLongEnough = false;
+            lcd.setCursor(7, 0);  
+            lcd.print("  ");
+            lcd.setCursor(7, 1);  
+            lcd.print("  ");
+            redLED();
+            delay(250); 
+            break;
+          }
+        }
+      } 
+      delay(500); 
     }
-    delay(1000); // 1 second delay
   }
-  
-    totalClick = 0;
-    for (int i = 0; i < 10; i++) {
-      totalClick += clickStatus[i];
-    }
-  
-    soil = (soil1 + soil2) / 2; // Average soil moisture
-    
-    // Check if the button was held down for longPress seconds continuously
-    if (totalClick >= longPress && soil <= safetyLim) {
-      startWatering();
-    }
+
+  if ((buttonHeldLongEnough == true) && (soil <= safetyLim)) {
+    startWatering();
   }
+  buttonHeldLongEnough = false; // Reset after watering starts
+
+  //.................Adjust trigger value......................
 
   int up   = digitalRead(buttonUp);
   int down = digitalRead(buttonDown); 
@@ -532,23 +598,17 @@ delay(100); // limits the code cycle to ~10Hz
   
     if ((averageSoil > soilGreen) && !(avgDeltaSoil > 0.01))           // Green light
     {
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,    LOW); 
+      greenLED();
     }
 
     else if ((averageSoil > soilYellow) && !(avgDeltaSoil > 0.01))     //  Yellow light
     {
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,   HIGH);
+      yellowLED();
     }
 
     else if ((averageSoil >= soilRed) && !(avgDeltaSoil > 0.01))       //  Red light
     {
-      digitalWrite(LED_Green,  LOW);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,   HIGH);
+      redLED();
     }
 
     else if ((averageSoil < soilRed) && !(avgDeltaSoil > 0.01))        // Red blink (3Hz)
@@ -564,6 +624,72 @@ delay(100); // limits the code cycle to ~10Hz
       digitalWrite(LED_Blue,     (millis() / 500) % 2); 
       digitalWrite(LED_Red,      (millis() / 500) % 2); 
     } 
+  }
+
+//...................Sensor Error........................................................
+  
+  if (isnan(h) || isnan(t)) 
+  {
+    Serial.println(F(" - DHT Sensor Error!"));
+
+    if (avgDeltaSoil > 0.01)                     // Soil Sensor Error
+    {
+      Serial.print(F(" -Soil~ "));
+      Serial.print(averageSoil);
+      Serial.print(F("%! "));
+      Serial.print(F(" -dx/dt: "));
+      Serial.print(avgDeltaSoil);
+      Serial.print(F("  -A0_Raw: "));
+      Serial.print(analogRead(A0));
+      
+      lcd.setCursor(0, 0); 
+      lcd.print("No sensors found");
+      lcd.setCursor(0, 1);
+      lcd.print(" *Manual Mode*  ");
+
+      digitalWrite(LED_Green,    LOW);
+      digitalWrite(LED_Blue,     (millis() / 2000) % 2);
+      digitalWrite(LED_Red,      (millis() / 2000) % 2);
+    } 
+    else                                         // Soil Sensor Working
+    { 
+      Serial.print(F("  Soil: "));
+      Serial.print(soil); 
+      Serial.print(F("%,  Avg: "));
+      Serial.print(averageSoil);
+      Serial.print(F("%,  dx/dt: "));
+      Serial.print(avgDeltaSoil);       
+      Serial.print(F(",  A0_Raw: "));  // Raw sensor data
+      Serial.print(analogRead(A0));
+      Serial.print(F(",  A2_Raw: "));  // Raw sensor data
+      Serial.print(analogRead(A2));
+      //
+      Serial.print(F("  -Pump: "));
+
+      if (digitalRead(pump) == HIGH) {
+      Serial.print(F("ON"));}
+      else {
+      Serial.print(F("OFF")); }
+      Serial.print(F(",  Elapsed time: "));  // Raw sensor data
+      Serial.print(timeElapsed);
+      //
+      lcd.setCursor(0, 1);
+      lcd.print("DHT Sensor Error");
+      lcd.setCursor(0, 0);
+      lcd.print("    Soil:");
+      lcd.setCursor(9, 0);    
+      lcd.print(averageSoil); 
+      if (averageSoil < 10) { 
+        lcd.setCursor(10, 0);
+        lcd.print("%     ");     
+       } 
+      else {
+        lcd.setCursor(11, 0);
+        lcd.print("%    ");  
+      }   
+    }
+    delay(25);
+  return;
   }
 
 //...................Print sensor data to LCD............................................
@@ -597,7 +723,7 @@ delay(100); // limits the code cycle to ~10Hz
     lcd.setCursor(3, 0);
     lcd.print(averageHI);
     lcd.setCursor(7, 0);
-    lcd.write(1);
+    lcd.write(5);
 
     lcd.setCursor(8, 0);  // LCD 1st row R - Humidity 
     lcd.print(" H:"); 
@@ -618,7 +744,7 @@ delay(100); // limits the code cycle to ~10Hz
     lcd.setCursor(11, 1);
     lcd.print(averageTemp);
     lcd.setCursor(15, 1);
-    lcd.write(1);    
+    lcd.write(5);    
   }
 
 //...................Print sensor data to Serial Port....................................
@@ -663,6 +789,58 @@ delay(100); // limits the code cycle to ~10Hz
 
 //...............FUNCTIONS.........................................................................
 
+
+//...................LED RGB.............................................................
+
+  void redLED() {
+    digitalWrite(LED_Red,   HIGH);
+    digitalWrite(LED_Green,  LOW);  
+    digitalWrite(LED_Blue,   LOW); 
+  }
+
+  void greenLED() {
+    digitalWrite(LED_Red,    LOW);
+    digitalWrite(LED_Green, HIGH);  
+    digitalWrite(LED_Blue,   LOW); 
+  }
+
+  void blueLED() {
+    digitalWrite(LED_Red,    LOW);
+    digitalWrite(LED_Green,  LOW);  
+    digitalWrite(LED_Blue,  HIGH); 
+  }
+
+  void yellowLED() {
+    digitalWrite(LED_Red,   HIGH);
+    digitalWrite(LED_Green, HIGH);  
+    digitalWrite(LED_Blue,   LOW); 
+  }
+
+  void tealLED() {
+    digitalWrite(LED_Red,    LOW);
+    digitalWrite(LED_Green, HIGH);  
+    digitalWrite(LED_Blue,  HIGH); 
+  }
+
+  void purpleLED() {
+    digitalWrite(LED_Red,   HIGH);
+    digitalWrite(LED_Green,  LOW);  
+    digitalWrite(LED_Blue,  HIGH); 
+  }
+
+  void whiteLED() {
+    digitalWrite(LED_Red,   HIGH);
+    digitalWrite(LED_Green, HIGH);  
+    digitalWrite(LED_Blue,  HIGH); 
+  }
+
+  void noLED() {
+    digitalWrite(LED_Red,    LOW);
+    digitalWrite(LED_Green,  LOW);  
+    digitalWrite(LED_Blue,   LOW); 
+  }
+
+
 void displayMessage(const char* line1, const char* line2) 
 {
   lcd.clear();
@@ -674,18 +852,24 @@ void displayMessage(const char* line1, const char* line2)
 
 void readAndDisplayData() 
 {
+  if (buttonHeldLongEnough == true) {
+    greenLED(); 
+  } else {
+  whiteLED(); }
+
   int soil1 = map(analogRead(A0), mapLo, mapHi, 100, 0);
   int soil2 = map(analogRead(A2), mapLo, mapHi, 100, 0);
+  int soil = (soil1 + soil2) / 2;
 
   lcd.setCursor(0, 0);
-  lcd.print("S1:");
+  lcd.print("S1: ");
   lcd.setCursor(4, 0);
   lcd.print(soil1);
   lcd.setCursor(6, 0);
   lcd.print("%");
 
   lcd.setCursor(9, 0);
-  lcd.print("S2:");
+  lcd.print("S2: ");
   lcd.setCursor(13, 0);
   lcd.print(soil2);
   lcd.setCursor(15, 0);
@@ -706,7 +890,7 @@ void readAndDisplayData()
   lcd.setCursor(11, 1);
   lcd.print(t);
   lcd.setCursor(15, 1);
-  lcd.write(3);
+  lcd.write(5);
 }
 
 void startWatering() {
@@ -724,19 +908,26 @@ void startWatering() {
   while (millis() < endTime) {
     int soiling = (map(analogRead(A0), mapLo, mapHi, 100, 0) + map(analogRead(A2), mapLo, mapHi, 100, 0)) / 2;
 
-    lcd.setCursor(1, 1);
+    lcd.setCursor(0, 1);
     lcd.print("Soil:");
-    lcd.setCursor(7, 1);
+    lcd.setCursor(6, 1);
     lcd.print(soiling);
-    lcd.setCursor(9, 1);
-    lcd.print("%");
+    lcd.setCursor(8, 1);
+    lcd.print("% ");
+    lcd.setCursor(10, 1);
 
     unsigned long remainingTime = (endTime - millis()) / 1000;
-    lcd.setCursor(11, 1);
-    lcd.print(" ");
-    lcd.setCursor(12, 1);
+    
+    if (remainingTime < 10) {
+      lcd.print("  t-");
+      lcd.setCursor(14, 1);
+    }
+    else {
+      lcd.print(" t-");
+      lcd.setCursor(13, 1);
+    }
     lcd.print(remainingTime);
-    lcd.setCursor(14, 1);
+    lcd.setCursor(15, 1);
     lcd.print("s");
 
     Serial.print(F("-Soil "));
@@ -749,6 +940,8 @@ void startWatering() {
     // Check if the button is pressed to stop watering early
     if (digitalRead(button) == HIGH) {
       digitalWrite(pump, LOW);
+      redLED(); 
+      delay(500); 
       return;
     }
 
