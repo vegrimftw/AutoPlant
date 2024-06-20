@@ -26,7 +26,7 @@ DHT dht(DHTPIN, DHTTYPE);
   int mapHi           = 510;              // Upper limit raw (dry ~ 520+) [1023] 
 
   // Time(r) 
-  int seconds          = 45;              // Pump stops after X seconds  
+  int seconds          = 30;              // Pump stops after X seconds  
   int manual           = 15;              // Timer for manual start of pump 
 
 //...................Inputs/Outputs & Variable...........................................
@@ -204,44 +204,30 @@ void setup() {
     lcd.print(" AutoWater for  ");
     lcd.setCursor(0, 1);
     lcd.print("Forgetful people");
-    digitalWrite(LED_Red,   HIGH);       // Test each LED color on startup 
+    redLED();       // Test each LED color on startup 
     delay(1000);
-    digitalWrite(LED_Red,    LOW);
-    digitalWrite(LED_Green, HIGH);
+    greenLED();
     delay(1000);
-    digitalWrite(LED_Green,  LOW);
-    digitalWrite(LED_Blue,  HIGH);
+    blueLED();
     delay(1000);
-    digitalWrite(LED_Blue,   LOW);
+    noLED();
     delay(500);
 
     if (toggleSwitch == HIGH)            // One soil sensor - One white blink at startup
     {      
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,  HIGH);
-      digitalWrite(LED_Red,   HIGH); 
+      whiteLED();
       delay (1000);
-      digitalWrite(LED_Green,  LOW);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,    LOW); 
+      noLED();
     } 
     else                                 // Two soil sensors - Two white blinks at startup 
     {
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,  HIGH);
-      digitalWrite(LED_Red,   HIGH); 
+      whiteLED(); 
       delay (500);
-      digitalWrite(LED_Green,  LOW);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,    LOW); 
+      noLED();
       delay (500);
-      digitalWrite(LED_Green, HIGH);
-      digitalWrite(LED_Blue,  HIGH);
-      digitalWrite(LED_Red,   HIGH); 
+      whiteLED();
       delay (500);
-      digitalWrite(LED_Green,  LOW);
-      digitalWrite(LED_Blue,   LOW);
-      digitalWrite(LED_Red,    LOW); 
+      noLED();
     }
     lcd.clear(); 
     Serial.println(F(" Initialized."));
