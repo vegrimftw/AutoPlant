@@ -282,7 +282,7 @@ delay(100); // limits the code cycle to ~10Hz
     soil = (soil1 + soil2) / 2; 
   }
 
-  // dx/dt    -   This derives the rate of change of input signal(s) to prevent eratic values 
+  // dx/dt    -   This derives the rate of change of input signal(s) to detect eratic values 
 
     // Use the analogAverage and soil variables after they are assigned
     prevSoilRaw = newSoilRaw;   // Saves soil level read from previous cycle
