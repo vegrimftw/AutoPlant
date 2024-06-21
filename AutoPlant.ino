@@ -18,7 +18,7 @@ DHT dht(DHTPIN, DHTTYPE);
   int tempLo           = 22;              // Blue blink - Too cold 
 
   // Misc
-  int longPress         = 3;              // Long press (seconds) 
+  int longPress         = 3;              // Long press [seconds] 
   int wateringDuration = 30;              // Manual watering duration [seconds]
  
   // Soil scaling                                             
