@@ -11,7 +11,7 @@ DHT dht(DHTPIN, DHTTYPE);
 
   // Pump triggers
   int triggerStart     = 40;              // This % will trigger the pump 
-  int triggerStop      = 90;              // Pump will stop at this % 
+  int triggerStop      = 95;              // Pump will stop at this % 
   
   // Temperature warning LED 
   int tempHi           = 28;              // Yellow/red blink - Too warm
