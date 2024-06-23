@@ -9,162 +9,161 @@ DHT dht(DHTPIN, DHTTYPE);
 
 //..................User Adjustable Variables..........................................
 
-// Pump triggers
-int triggerStart = 40;  // This % will trigger the pump
-int triggerStop = 90;   // Pump will stop at this %
+  // Pump triggers
+  int triggerStart = 40;  // This % will trigger the pump
+  int triggerStop = 90;   // Pump will stop at this %
 
-// Temperature warning LED
-int tempHi = 28;  // Yellow/red blink - Too warm
-int tempLo = 22;  // Blue blink - Too cold
+  // Temperature warning LED
+  int tempHi = 28;  // Yellow/red blink - Too warm
+  int tempLo = 22;  // Blue blink - Too cold
 
-// Misc
-int longPress = 3;          // Long press (seconds)
-int wateringDuration = 30;  // Manual watering duration [seconds]
+  // Misc
+  int longPress = 3;          // Long press (seconds)
+  int wateringDuration = 30;  // Manual watering duration [seconds]
 
-// Soil scaling
-int mapLo = 180;  // Lower limit raw (wet ~ 180-) [0]
-int mapHi = 510;  // Upper limit raw (dry ~ 510+) [1023]
+  // Soil scaling
+  int mapLo = 180;  // Lower limit raw (wet ~ 180-) [0]
+  int mapHi = 510;  // Upper limit raw (dry ~ 510+) [1023]
 
-// Time(r)
-int seconds = 45;  // Pump stops after X seconds
-int manual = 30;   // Timer for manual start of pump
+  // Time(r)
+  int seconds = 45;  // Pump stops after X seconds
 
 //...................Inputs/Outputs & Variable...........................................
 
-elapsedMillis timeElapsed;
-unsigned int interval = 1000;  // Timer variable, don't touch
+  elapsedMillis timeElapsed;
+  unsigned int interval = 1000;  // Timer variable, don't touch
 
-// Input/Output pins
+  // Input/Output pins
 
-const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 7;  // LCD
-const int pump = 8;
-//        DHT Sensor    = 9;
-const int button = 10;
-const int LED_Red = 14;    // Arduino Uno: 11
-const int LED_Green = 15;  // Arduino Uno: 12
-const int LED_Blue = 16;   // Arduino Uno: 13
-const int soil1 = A0;
-const int buttonDown = A1;
-const int soil2 = A2;
-const int buttonUp = A3;
-const int toggleSwitch = A4;  // UNO
-const int spare = A5;         // UNO
+  const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 7;  // LCD
+  const int pump = 8;
+  //        DHT Sensor    = 9;
+  const int button = 10;
+  const int LED_Red = 14;    // Arduino Uno: 11
+  const int LED_Green = 15;  // Arduino Uno: 12
+  const int LED_Blue = 16;   // Arduino Uno: 13
+  const int soil1 = A0;
+  const int buttonDown = A1;
+  const int soil2 = A2;
+  const int buttonUp = A3;
+  const int toggleSwitch = A4;  // UNO
+  const int spare = A5;         // UNO
 
-// Random variables
+  // Random variables
 
-int y;
-int click = 0;
-int totalClick;
-int clickStatus[12];
-int triggerstart;  // Used for serial input
+  int y;
+  int click = 0;
+  int totalClick;
+  int clickStatus[12];
+  int triggerstart;  // Used for serial input
 
-int prevSoil;
-int newSoil;
-double dxSoil;
-double deltaSoil;
-double prevSoilRaw;
-double newSoilRaw;
-double previousTime;
-double newTime;
-double previousTime2;
-double newTime2;
-bool buttonHeldLongEnough = false;
+  int prevSoil;
+  int newSoil;
+  double dxSoil;
+  double deltaSoil;
+  double prevSoilRaw;
+  double newSoilRaw;
+  double previousTime;
+  double newTime;
+  double previousTime2;
+  double newTime2;
+  bool buttonHeldLongEnough = false;
 
-void redLED(int blinkInterval = -1);
-void greenLED(int blinkInterval = -1);
-void blueLED(int blinkInterval = -1);
-void yellowLED(int blinkInterval = -1);
-void tealLED(int blinkInterval = -1);
-void purpleLED(int blinkInterval = -1);
-void whiteLED(int blinkInterval = -1);
+  void redLED(int blinkInterval = -1);
+  void greenLED(int blinkInterval = -1);
+  void blueLED(int blinkInterval = -1);
+  void yellowLED(int blinkInterval = -1);
+  void tealLED(int blinkInterval = -1);
+  void purpleLED(int blinkInterval = -1);
+  void whiteLED(int blinkInterval = -1);
 
 //...................Average for-loops...................................................
 
-// numReadings is the amount of sensor data readings being averaged out
+  // numReadings is the amount of sensor data readings being averaged out
 
-const int numReadings1 = 32;  // Average Soil
-int soilReadings[numReadings1];
-int soilIndex = 0;
-int totalSoil = 0;
+  const int numReadings1 = 32;  // Average Soil
+  int soilReadings[numReadings1];
+  int soilIndex = 0;
+  int totalSoil = 0;
 
-const int numReadings2 = 32;  // Average Temperature
-float tempReadings[numReadings2];
-int tempIndex = 0;
-float totalTemp = 0;
+  const int numReadings2 = 32;  // Average Temperature
+  float tempReadings[numReadings2];
+  int tempIndex = 0;
+  float totalTemp = 0;
 
-const int numReadings3 = 32;  // Average Humidity
-float humidReadings[numReadings3];
-int humidIndex = 0;
-float totalHumid = 0;
+  const int numReadings3 = 32;  // Average Humidity
+  float humidReadings[numReadings3];
+  int humidIndex = 0;
+  float totalHumid = 0;
 
-const int numReadings4 = 32;  // Average Heat Index
-float hiReadings[numReadings4];
-int hiIndex = 0;
-float totalHi = 0;
+  const int numReadings4 = 32;  // Average Heat Index
+  float hiReadings[numReadings4];
+  int hiIndex = 0;
+  float totalHi = 0;
 
-const int numReadings5 = 32;  // Average dx/dt
-float dxdtReadings[numReadings5];
-int dxdtIndex = 0;
-float totalDxdt = 0;
+  const int numReadings5 = 32;  // Average dx/dt
+  float dxdtReadings[numReadings5];
+  int dxdtIndex = 0;
+  float totalDxdt = 0;
 
 //...................LCD + Symbols.......................................................
 
-LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+  LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-byte celcius[8] = {
-  B01000,
-  B10100,
-  B01011,
-  B00100,
-  B00100,
-  B00100,
-  B00011,
-  B00000,
-};
+  byte celcius[8] = {
+    B01000,
+    B10100,
+    B01011,
+    B00100,
+    B00100,
+    B00100,
+    B00011,
+    B00000,
+  };
 
-byte topLeft[8] = {
-  B00000,
-  B00000,
-  B00000,
-  B00000,
-  B00001,
-  B00011,
-  B00110,
-  B01101,
-};
+  byte topLeft[8] = {
+    B00000,
+    B00000,
+    B00000,
+    B00000,
+    B00001,
+    B00011,
+    B00110,
+    B01101,
+  };
 
-byte topRight[8] = {
-  B00000,
-  B00000,
-  B10000,
-  B10000,
-  B10000,
-  B11000,
-  B01100,
-  B00110,
-};
+  byte topRight[8] = {
+    B00000,
+    B00000,
+    B10000,
+    B10000,
+    B10000,
+    B11000,
+    B01100,
+    B00110,
+  };
 
-byte bottomLeft[8] = {
-  B01101,
-  B01100,
-  B00110,
-  B00011,
-  B00000,
-  B00000,
-  B00000,
-  B00000,
-};
+  byte bottomLeft[8] = {
+    B01101,
+    B01100,
+    B00110,
+    B00011,
+    B00000,
+    B00000,
+    B00000,
+    B00000,
+  };
 
-byte bottomRight[8] = {
-  B10110,
-  B00110,
-  B01100,
-  B11000,
-  B00000,
-  B00000,
-  B00000,
-  B00000,
-};
+  byte bottomRight[8] = {
+    B10110,
+    B00110,
+    B01100,
+    B11000,
+    B00000,
+    B00000,
+    B00000,
+    B00000,
+  };
 
 
 //...............SETUP.............................................................................
@@ -473,22 +472,6 @@ void loop() {
         Serial.println(seconds);
       } else {
         Serial.println("Invalid seconds value.");
-      }
-    }
-
-    // ...Trigger edit...
-
-    if (command.startsWith("trigger ")) {
-      String numberString = command.substring(8);  // Extract number part after "trigger "
-      int newManual = numberString.toInt();        // Convert to integer
-
-      if (newManual > 0) {
-        manual = newManual;
-        Serial.print(F("Manual pump timer updated. Pump will run for "));
-        Serial.print(manual);
-        Serial.println(F(" seconds when started."));
-      } else {
-        Serial.println(F("Invalid seconds value."));
       }
     }
 
