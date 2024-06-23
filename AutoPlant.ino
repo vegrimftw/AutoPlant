@@ -434,24 +434,26 @@ void loop() {
   int down = digitalRead(buttonDown);
 
   if (up == HIGH) {
-    triggerStart = triggerStart + 1;
+    triggerStart = triggerStart + 1; 
+    lcd.clear(); 
     lcd.setCursor(0, 0);
     lcd.print("Pump trigger:");
     lcd.setCursor(13, 0);
     lcd.print(triggerStart);
     lcd.setCursor(15, 1);
     lcd.print("%");
-    delay(750);  // avoids multiple inputs
-  }
+    delay (500);   // avoids multiple inputs 
+  } 
   if (down == HIGH) {
-    triggerStart = triggerStart - 1;
+    triggerStart = triggerStart - 1; 
+    lcd.clear(); 
     lcd.setCursor(0, 0);
     lcd.print("Pump trigger:");
     lcd.setCursor(13, 0);
     lcd.print(triggerStart);
     lcd.setCursor(15, 1);
     lcd.print("%");
-    delay(750);
+    delay (500); 
   }
 
 //...................Serial Input........................................................
