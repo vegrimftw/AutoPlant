@@ -19,6 +19,7 @@ Takes care of plants or whatever for people who can't maintain one by themselves
   5. The serial input section of the code is for writing instructions to the Arduino while it's running.* 
      To change the:
      timer value,   write this: timer xy
+     
      trigger value, write this: trigger xy
      xy = number, then press ENTER button to send the command. For example: "trigger 45"
 
