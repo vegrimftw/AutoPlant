@@ -22,7 +22,8 @@ Takes care of plants or whatever for people who can't maintain one by themselves
      timer value,   write this: timer xy
      
      trigger value, write this: trigger xy
-     xy = number, then press ENTER button to send the command. For example: "trigger 45"
+
+     ..then press ENTER button to send the command. For example: "trigger 45"
 
      The pump can also be started the same way, simply write this:  
      "pump on" or "pump off"
