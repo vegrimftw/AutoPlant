@@ -734,6 +734,113 @@ void loop() {
       digitalWrite(relay,  LOW); }
   }
 
+  
+  void displayMessage(const char* line1, const char* line2) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(line1);
+    lcd.setCursor(0, 1);
+    lcd.print(line2);
+  }
+
+  void readAndDisplayData() {
+    if (buttonHeldLongEnough == true) {
+      greenLED();
+    } else {
+      whiteLED();
+    }
+
+    int soil1 = map(analogRead(A0), mapLo, mapHi, 100, 0);
+    int soil2 = map(analogRead(A2), mapLo, mapHi, 100, 0);
+    int soil = (soil1 + soil2) / 2;
+
+    lcd.setCursor(0, 0);
+    lcd.print("S1: ");
+    lcd.setCursor(4, 0);
+    lcd.print(soil1);
+    lcd.setCursor(6, 0);
+    lcd.print("%");
+
+    lcd.setCursor(9, 0);
+    lcd.print("S2: ");
+    lcd.setCursor(13, 0);
+    lcd.print(soil2);
+    lcd.setCursor(15, 0);
+    lcd.print("%");
+
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
+
+    lcd.setCursor(0, 1);
+    lcd.print("H:");
+    lcd.setCursor(2, 1);
+    lcd.print(h);
+    lcd.setCursor(6, 1);
+    lcd.print("%");
+
+    lcd.setCursor(9, 1);
+    lcd.print("T:");
+    lcd.setCursor(11, 1);
+    lcd.print(t);
+    lcd.setCursor(15, 1);
+    lcd.write(5);
+  }
+
+  void startWatering() {
+    const int checkInterval = 1000;  // interval to check button and update display in milliseconds
+    const unsigned long endTime = millis() + (wateringDuration * 1000);
+
+    tealLED();
+    lcd.clear();
+    Serial.println(F("Watering now!"));
+    lcd.setCursor(1, 0);
+    lcd.print("Watering now!");
+
+    while (millis() < endTime) {
+      int soilYo = (map(analogRead(A0), mapLo, mapHi, 100, 0) + map(analogRead(A2), mapLo, mapHi, 100, 0)) / 2;
+
+      lcd.setCursor(0, 1);
+      lcd.print("Soil:");
+      lcd.setCursor(6, 1);
+      lcd.print(soilYo);
+      lcd.setCursor(8, 1);
+      lcd.print("% ");
+      lcd.setCursor(10, 1);
+
+      unsigned long remainingTime = (endTime - millis()) / 1000;
+
+      if (remainingTime < 10) {
+        lcd.print("  t-");
+        lcd.setCursor(14, 1);
+      } else {
+        lcd.print(" t-");
+        lcd.setCursor(13, 1);
+      }
+      lcd.print(remainingTime);
+      lcd.setCursor(15, 1);
+      lcd.print("s");
+
+      Serial.print(F("-Soil "));
+      Serial.print(soilYo);
+      Serial.print(F("%  - "));
+      Serial.println(remainingTime);
+
+      pump(on); 
+
+      // Check if the button is pressed to stop watering early
+      if (digitalRead(button) == HIGH) {
+        pump(off); 
+        redLED();
+        delay(500);
+        return;
+      }
+
+      delay(checkInterval);  // wait for checkInterval before updating again
+    }
+
+    pump(off); 
+  }
+
 //...................LED RGB.............................................................
 
 void redLED(int blinkInterval = -1) {
@@ -826,109 +933,3 @@ void noLED() {
   digitalWrite(LED_Blue, LOW);
 }
 
-
-void displayMessage(const char* line1, const char* line2) {
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(line1);
-  lcd.setCursor(0, 1);
-  lcd.print(line2);
-}
-
-void readAndDisplayData() {
-  if (buttonHeldLongEnough == true) {
-    greenLED();
-  } else {
-    whiteLED();
-  }
-
-  int soil1 = map(analogRead(A0), mapLo, mapHi, 100, 0);
-  int soil2 = map(analogRead(A2), mapLo, mapHi, 100, 0);
-  int soil = (soil1 + soil2) / 2;
-
-  lcd.setCursor(0, 0);
-  lcd.print("S1: ");
-  lcd.setCursor(4, 0);
-  lcd.print(soil1);
-  lcd.setCursor(6, 0);
-  lcd.print("%");
-
-  lcd.setCursor(9, 0);
-  lcd.print("S2: ");
-  lcd.setCursor(13, 0);
-  lcd.print(soil2);
-  lcd.setCursor(15, 0);
-  lcd.print("%");
-
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
-
-  lcd.setCursor(0, 1);
-  lcd.print("H:");
-  lcd.setCursor(2, 1);
-  lcd.print(h);
-  lcd.setCursor(6, 1);
-  lcd.print("%");
-
-  lcd.setCursor(9, 1);
-  lcd.print("T:");
-  lcd.setCursor(11, 1);
-  lcd.print(t);
-  lcd.setCursor(15, 1);
-  lcd.write(5);
-}
-
-void startWatering() {
-  const int checkInterval = 1000;  // interval to check button and update display in milliseconds
-  const unsigned long endTime = millis() + (wateringDuration * 1000);
-
-  tealLED();
-  lcd.clear();
-  Serial.println(F("Watering now!"));
-  lcd.setCursor(1, 0);
-  lcd.print("Watering now!");
-
-  while (millis() < endTime) {
-    int soilYo = (map(analogRead(A0), mapLo, mapHi, 100, 0) + map(analogRead(A2), mapLo, mapHi, 100, 0)) / 2;
-
-    lcd.setCursor(0, 1);
-    lcd.print("Soil:");
-    lcd.setCursor(6, 1);
-    lcd.print(soilYo);
-    lcd.setCursor(8, 1);
-    lcd.print("% ");
-    lcd.setCursor(10, 1);
-
-    unsigned long remainingTime = (endTime - millis()) / 1000;
-
-    if (remainingTime < 10) {
-      lcd.print("  t-");
-      lcd.setCursor(14, 1);
-    } else {
-      lcd.print(" t-");
-      lcd.setCursor(13, 1);
-    }
-    lcd.print(remainingTime);
-    lcd.setCursor(15, 1);
-    lcd.print("s");
-
-    Serial.print(F("-Soil "));
-    Serial.print(soilYo);
-    Serial.print(F("%  - "));
-    Serial.println(remainingTime);
-
-    pump(on); 
-
-    // Check if the button is pressed to stop watering early
-    if (digitalRead(button) == HIGH) {
-      pump(off); 
-      redLED();
-      delay(500);
-      return;
-    }
-
-    delay(checkInterval);  // wait for checkInterval before updating again
-  }
-
-  pump(off); 
-}
