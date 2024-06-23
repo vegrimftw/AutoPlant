@@ -36,7 +36,7 @@ DHT dht(DHTPIN, DHTTYPE);
   // Input/Output pins
 
   const int rs = 3, en = 2, d4 = 4, d5 = 5, d6 = 6, d7 = 7;  // LCD
-  const int pump = 8;
+  const int relay = 8;
   //        DHT Sensor    = 9;
   const int button = 10;
   const int LED_Red = 14;    // Arduino Uno: 11
@@ -48,9 +48,10 @@ DHT dht(DHTPIN, DHTTYPE);
   const int buttonUp = A3;
   const int toggleSwitch = A4;  // UNO
   const int spare = A5;         // UNO
+  const int on = HIGH;
+  const int off = LOW;
 
   // Random variables
-
   int y;
   int click = 0;
   int totalClick;
@@ -189,7 +190,7 @@ void setup() {
   pinMode(A4, INPUT);   // Toggle Button
   pinMode(A5, OUTPUT);  // Spare (Pump 2?)
 
-  digitalWrite(pump, LOW);  // Just because
+  pump(off);            // Just because
 
   lcd.createChar(1, topLeft);
   lcd.createChar(2, topRight);
@@ -494,12 +495,12 @@ void loop() {
     // ...Manual Pump trigger...
 
     else if (command == "pump on") {
-      digitalWrite(pump, HIGH);
+      pump(on); 
       Serial.println("Pump is ON");
     }
 
     else if (command == "pump off") {
-      digitalWrite(pump, LOW);
+      pump(off); 
       Serial.println("Pump is OFF");
     }
   }
@@ -509,22 +510,22 @@ void loop() {
   // Pump will start if both sensors and the average value are below certain value (triggerStart)
 
   if ((soil1 <= (triggerStart + 5)) && (soil2 <= (triggerStart + 5)) && (averageSoil <= triggerStart) && (averageSoil > lowerLim) && (dsdt < 0.001) && (avgDeltaSoil < 0.01)) {
-    digitalWrite(pump, HIGH);
+    pump(on); 
     delay(50);
   }
 
   // Stops pump if the average soil value exceeds trigger stop value OR both sensors exceeds trigger stop value, whatever comes first.
 
   if ((averageSoil < lowerLim) || (averageSoil > triggerStop) || ((soil1 > triggerStop) & (soil2 > triggerStop))) {
-    digitalWrite(pump, LOW);
+    pump(off); 
   }
 
   // If pump is ON for more than x seconds, pump turns OFF
 
-  if (digitalRead(pump) == HIGH) {
+  if (digitalRead(relay) == HIGH) {
     if (timeElapsed > timer)  // Timer starts counting
     {
-      digitalWrite(pump, LOW);
+      pump(off); 
       return;
     }
   } else {
@@ -726,6 +727,12 @@ void loop() {
 
 //...............FUNCTIONS.........................................................................
 
+  void pump(int state) {
+  if (state == on) {
+      digitalWrite(relay, HIGH); } 
+    else if (state == off) {
+      digitalWrite(relay,  LOW); }
+  }
 
 //...................LED RGB.............................................................
 
@@ -910,11 +917,11 @@ void startWatering() {
     Serial.print(F("%  - "));
     Serial.println(remainingTime);
 
-    digitalWrite(pump, HIGH);
+    pump(on); 
 
     // Check if the button is pressed to stop watering early
     if (digitalRead(button) == HIGH) {
-      digitalWrite(pump, LOW);
+      pump(off); 
       redLED();
       delay(500);
       return;
@@ -923,5 +930,5 @@ void startWatering() {
     delay(checkInterval);  // wait for checkInterval before updating again
   }
 
-  digitalWrite(pump, LOW);
+  pump(off); 
 }
