@@ -10,21 +10,21 @@ DHT dht(DHTPIN, DHTTYPE);
 //..................User Adjustable Variables..........................................
 
   // Pump triggers
-  int triggerStart     = 40;  // This % will trigger the pump
+  int triggerStart     = 40;   // This % will trigger the pump
   int triggerStop      = 90;   // Pump will stop at this %
 
   // Temperature warning LED
-  int tempHi           = 28;  // Yellow/red blink - Too warm
-  int tempLo           = 22;  // Blue blink - Too cold
+  int tempHi           = 28;   // Yellow/red blink - Too warm
+  int tempLo           = 22;   // Blue blink - Too cold
 
   // Soil scaling
   int mapLo            = 180;  // Lower limit raw (wet ~ 180-) [0]
   int mapHi            = 510;  // Upper limit raw (dry ~ 510+) [1023]
 
   // Time(r)
-  int seconds          = 45;  // Pump stops after X seconds
-  int longPress        = 3;          // Long press (seconds)
-  int wateringDuration = 30;  // Manual watering duration [seconds]
+  int seconds          = 45;   // Pump stops after X seconds
+  int longPress        = 3;    // Long press (seconds)
+  int wateringDuration = 30;   // Manual watering duration [seconds]
 
 //...................Inputs/Outputs & Variable...........................................
 
