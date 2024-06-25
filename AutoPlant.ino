@@ -3,7 +3,7 @@
 #include <LiquidCrystal.h>
 #include <elapsedMillis.h>
 
-#define DHTPIN 6  // Temperature & Humidity sensor on digital input D6
+#define DHTPIN 9  // Temperature & Humidity sensor on digital input D9
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
