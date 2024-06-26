@@ -215,13 +215,12 @@ void setup() {
   noLED();
   delay(250); 
 
-  if (toggleSwitch == HIGH)  // One soil sensor - One white blink at startup
-  {
+  if (toggleSwitch == HIGH) {     // One soil sensor - One white blink at startup
     whiteLED();
     delay(1000);
     noLED();
-  } else  // Two soil sensors - Two white blinks at startup
-  {
+  } 
+  else {                          // Two soil sensors - Two white blinks at startup
     whiteLED();
     delay(500);
     noLED();
@@ -271,12 +270,11 @@ void loop() {
   int analogAverage;
   int soil;
 
-  if (toggleSwitch == HIGH)  // One soil sensor
-  {
+  if (toggleSwitch == HIGH) {          // One soil sensor
     analogAverage = analogRead(A1);
     soil = soil1;
-  } else  // Two soil sensors
-  {
+  } 
+  else {                               // Two soil sensors
     analogAverage = (analogRead(A1) + analogRead(A2)) / 2;
     soil = (soil1 + soil2) / 2;
   }
@@ -301,7 +299,8 @@ void loop() {
 
   // Calculate the total of all readings
   totalDxdt = 0;
-  for (int i = 0; i < numReadings5; i++) { totalDxdt += dxdtReadings[i]; }
+  for (int i = 0; i < numReadings5; i++) { 
+    totalDxdt += dxdtReadings[i]; }
 
   // Calculate the average Humidity value
   float avgDeltaSoil = totalDxdt / numReadings5;
@@ -314,7 +313,8 @@ void loop() {
 
   // Calculate the total of all readings
   totalSoil = 0;
-  for (int i = 0; i < numReadings1; i++) { totalSoil += soilReadings[i]; }
+  for (int i = 0; i < numReadings1; i++) { 
+    totalSoil += soilReadings[i]; }
 
   // Calculate the average soil value
   int averageSoil = totalSoil / numReadings1;
@@ -327,7 +327,8 @@ void loop() {
 
   // Calculate the total of all readings
   totalTemp = 0;
-  for (int i = 0; i < numReadings2; i++) { totalTemp += tempReadings[i]; }
+  for (int i = 0; i < numReadings2; i++) { 
+    totalTemp += tempReadings[i]; }
 
   // Calculate the average Temperature value
   float averageTemp = totalTemp / numReadings2;
@@ -340,7 +341,8 @@ void loop() {
 
   // Calculate the total of all readings
   totalHumid = 0;
-  for (int i = 0; i < numReadings3; i++) { totalHumid += humidReadings[i]; }
+  for (int i = 0; i < numReadings3; i++) { 
+    totalHumid += humidReadings[i]; }
 
   // Calculate the average Humidity value
   float averageHumid = totalHumid / numReadings3;
@@ -353,7 +355,8 @@ void loop() {
 
   // Calculate the total of all readings
   totalHi = 0;
-  for (int i = 0; i < numReadings4; i++) { totalHi += hiReadings[i]; }
+  for (int i = 0; i < numReadings4; i++) { 
+    totalHi += hiReadings[i]; }
 
   // Calculate the average Humidity value
   float averageHI = totalHi / numReadings4;
@@ -471,7 +474,8 @@ void loop() {
         timer = interval * seconds;  // Reset timer with new seconds value
         Serial.print("Seconds set to: ");
         Serial.println(seconds);
-      } else {
+      } 
+      else {
         Serial.println("Invalid seconds value.");
       }
     }
@@ -487,7 +491,8 @@ void loop() {
         Serial.print(F("Trigger value updated. Watering will start below "));
         Serial.print(triggerStart);
         Serial.println(F("%"));
-      } else {
+      } 
+      else {
         Serial.println(F("Invalid seconds value."));
       }
     }
@@ -570,8 +575,7 @@ void loop() {
   if (isnan(h) || isnan(t)) {
     Serial.println(F(" - DHT Sensor Error!"));
 
-    if (avgDeltaSoil > 0.01)  // Soil Sensor Error
-    {
+    if (avgDeltaSoil > 0.01) {         // Soil Sensor Error
       Serial.print(F(" -Soil~ "));
       Serial.print(averageSoil);
       Serial.print(F("%! "));
@@ -584,8 +588,8 @@ void loop() {
       lcd.print("No sensors found");
       lcd.setCursor(0, 1);
       lcd.print(" *Manual Mode*  ");
-    } else  // Soil Sensor Working
-    {
+    } 
+    else {                           // Soil Sensor Working
       Serial.print(F("  Soil: "));
       Serial.print(soil);
       Serial.print(F("%,  Avg: "));
@@ -601,7 +605,8 @@ void loop() {
 
       if (digitalRead(pump) == HIGH) {
         Serial.print(F("ON"));
-      } else {
+      } 
+      else {
         Serial.print(F("OFF"));
       }
       Serial.print(F(",  Elapsed time: "));  // Raw sensor data
@@ -616,7 +621,8 @@ void loop() {
       if (averageSoil < 10) {
         lcd.setCursor(10, 0);
         lcd.print("%     ");
-      } else {
+      } 
+      else {
         lcd.setCursor(11, 0);
         lcd.print("%    ");
       }
@@ -629,19 +635,19 @@ void loop() {
 
   if (digitalRead(pump) == HIGH) {
     lcd.clear();
-    lcd.setCursor(0, 0);  //
-    lcd.print("Watering now!");
+    lcd.setCursor(0, 0);  
+    lcd.print("Watering now!");           // LCD 1st row 
     lcd.setCursor(14, 0);
     lcd.print(seconds - (timeElapsed / 1000));
 
-    lcd.setCursor(0, 1);  // LCD 2nd row L - Soil
+    lcd.setCursor(0, 1);                  // LCD 2nd row Left - Soil
     lcd.print("Soil:");
     lcd.setCursor(5, 1);
     lcd.print(averageSoil);
     lcd.setCursor(7, 1);
     lcd.print("% ");
 
-    lcd.setCursor(9, 1);  // LCD 2nd row R - Temperature
+    lcd.setCursor(9, 1);                  // LCD 2nd row Right - Temperature
     lcd.print("Raw:");
     lcd.setCursor(13, 1);
     lcd.print(soil);
@@ -650,28 +656,28 @@ void loop() {
   }
 
   else {
-    lcd.setCursor(0, 0);  // LCD 1st row L - Relative Humidity
+    lcd.setCursor(0, 0);                  // LCD 1st row Left - Relative Humidity
     lcd.print("HI:");
     lcd.setCursor(3, 0);
     lcd.print(averageHI);
     lcd.setCursor(7, 0);
     lcd.write(5);
 
-    lcd.setCursor(8, 0);  // LCD 1st row R - Humidity
+    lcd.setCursor(8, 0);                  // LCD 1st row Right - Humidity
     lcd.print(" H:");
     lcd.setCursor(11, 0);
     lcd.print(averageHumid);
     lcd.setCursor(15, 0);
     lcd.print("%");
 
-    lcd.setCursor(0, 1);  // LCD 2nd row L - Soil
+    lcd.setCursor(0, 1);                  // LCD 2nd row Left - Soil
     lcd.print("Soil:");
     lcd.setCursor(5, 1);
     lcd.print(averageSoil);
     lcd.setCursor(7, 1);
     lcd.print("% ");
 
-    lcd.setCursor(9, 1);  // LCD 2nd row R - Temperature
+    lcd.setCursor(9, 1);                  // LCD 2nd row Right - Temperature
     lcd.print("T:");
     lcd.setCursor(11, 1);
     lcd.print(averageTemp);
@@ -682,46 +688,46 @@ void loop() {
 //...................Print sensor data to Serial Port....................................
 
   Serial.print(F(" T: "));
-  Serial.print(t);  // average Temperature
+  Serial.print(t);                        // average Temperature
   Serial.print(F("°C, "));
 
   Serial.print(F(" H: "));
-  Serial.print(h);  // average Humidity
+  Serial.print(h);                        // average Humidity
   Serial.print(F("%, -"));
 
   Serial.print(F(" Avg: "));
-  Serial.print(averageSoil);  // Average soil sensor level
+  Serial.print(averageSoil);              // Average soil sensor level
   Serial.print(F("%, "));
 
-  Serial.print(F(" dx/dt: "));  // Average rate of change of soil sensor
+  Serial.print(F(" dx/dt: "));            // Average rate of change of soil sensor
   Serial.print(avgDeltaSoil);
 
   Serial.print(F("  Soil 1: "));
-  Serial.print(soil1);  // Real-time soil (scaled) 1
+  Serial.print(soil1);                    // Real-time soil (scaled) 1
   Serial.print(F("%, "));
   Serial.print(F("  Soil 2: "));
-  Serial.print(soil2);  // Real-time soil (scaled) 2
+  Serial.print(soil2);                    // Real-time soil (scaled) 2
   Serial.print(F("%, "));
 
-  Serial.print(F(",  A0_Raw: "));  // Raw soil sensor data 1
+  Serial.print(F(",  A0_Raw: "));         // Raw soil sensor data 1
   Serial.print(analogRead(A1));
-  Serial.print(F(",  A2_Raw: "));  // Raw soil sensor data 2
+  Serial.print(F(",  A2_Raw: "));         // Raw soil sensor data 2
   Serial.print(analogRead(A2));
 
   Serial.print(F(",  Trigger value: "));  // Trigger value [%]
   Serial.print(triggerStart);
 
-  Serial.print(F(",  Timer: "));  // Emergency cut-off timer for pump
+  Serial.print(F(",  Timer: "));          // Emergency cut-off timer value (pump)
   Serial.print(seconds);
 
-  Serial.print(F(", - Elapsed time: "));  // Cut-off counter for pump
+  Serial.print(F(", - Elapsed time: "));  // Cut-off counter timer (pump)
   Serial.println(timeElapsed);            // ln = new line (enter)
 }
 
 //...............FUNCTIONS.........................................................................
 
   void pump(int state) {
-  if (state == on) {
+    if (state == on) {
       digitalWrite(relay, HIGH); } 
     else if (state == off) {
       digitalWrite(relay,  LOW); }
@@ -739,7 +745,8 @@ void loop() {
   void readAndDisplayData() {
     if (buttonHeldLongEnough == true) {
       greenLED();
-    } else {
+    } 
+    else {
       whiteLED();
     }
 
@@ -805,7 +812,8 @@ void loop() {
       if (remainingTime < 10) {
         lcd.print("  t-");
         lcd.setCursor(14, 1);
-      } else {
+      } 
+      else {
         lcd.print(" t-");
         lcd.setCursor(13, 1);
       }
@@ -841,7 +849,8 @@ void redLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, HIGH);
     digitalWrite(LED_Green, LOW);
     digitalWrite(LED_Blue, LOW);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Green, LOW);
     digitalWrite(LED_Blue, LOW);
@@ -853,7 +862,8 @@ void greenLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, LOW);
     digitalWrite(LED_Green, HIGH);
     digitalWrite(LED_Blue, LOW);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, LOW);
     digitalWrite(LED_Green, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Blue, LOW);
@@ -865,7 +875,8 @@ void blueLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, LOW);
     digitalWrite(LED_Green, LOW);
     digitalWrite(LED_Blue, HIGH);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, LOW);
     digitalWrite(LED_Green, LOW);
     digitalWrite(LED_Blue, (millis() / blinkInterval) % 2);
@@ -877,7 +888,8 @@ void yellowLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, HIGH);
     digitalWrite(LED_Green, HIGH);
     digitalWrite(LED_Blue, LOW);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Green, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Blue, LOW);
@@ -889,7 +901,8 @@ void tealLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, LOW);
     digitalWrite(LED_Green, HIGH);
     digitalWrite(LED_Blue, HIGH);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, LOW);
     digitalWrite(LED_Green, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Blue, (millis() / blinkInterval) % 2);
@@ -901,7 +914,8 @@ void purpleLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, HIGH);
     digitalWrite(LED_Green, HIGH);
     digitalWrite(LED_Blue, LOW);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Green, LOW);
     digitalWrite(LED_Blue, (millis() / blinkInterval) % 2);
@@ -925,4 +939,3 @@ void noLED() {
   digitalWrite(LED_Green, LOW);
   digitalWrite(LED_Blue, LOW);
 }
-
