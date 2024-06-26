@@ -188,7 +188,6 @@ void setup() {
   pinMode(A3, OUTPUT);  // Button Up
   pinMode(A4, INPUT);   // Toggle Button
   pinMode(A5, OUTPUT);  // Spare (Pump 2?)
-
   pump(off);            // Just because
 
   lcd.createChar(1, topLeft);
@@ -197,7 +196,6 @@ void setup() {
   lcd.createChar(4, bottomRight);
   lcd.createChar(5, celcius);
   lcd.begin(16, 2);
-
 
   //...................Startup procedure.................................................
 
@@ -279,99 +277,77 @@ void loop() {
     soil = (soil1 + soil2) / 2;
   }
 
-  // dx/dt    -   This derives the rate of change of input signal(s) to detect eratic values
+  //.......dx/dt....... - This derives the rate of change of input signal(s) to detect eratic values
 
-  // Use the analogAverage and soil variables after they are assigned
-  prevSoilRaw = newSoilRaw;  // Saves soil level read from previous cycle
+  prevSoilRaw = newSoilRaw;   // Saves soil level read from previous cycle
   newSoilRaw = analogAverage;
-
-  previousTime = newTime;  // Saves the time of the previous cycle
-  newTime = millis();      // Filling up/down(+/-)  /  cycle runtime  -  (millis() / 100)
+  previousTime = newTime;     // Saves the time of the previous cycle
+  newTime = millis();         
 
   float dxSoil = ((newSoilRaw - prevSoilRaw) / (newTime - previousTime));
   float dxdtSoil = (dxSoil * dxSoil);  // Avoids negative numbers
 
-  // Average dx/dt
+  //.......Average dx/dt.......
 
-  // Store the current reading in the array
-  dxdtReadings[dxdtIndex] = dxdtSoil;
-  dxdtIndex = (dxdtIndex + 1) % numReadings5;  // Move to the next index, cycling through the array
-
-  // Calculate the total of all readings
-  totalDxdt = 0;
+  dxdtReadings[dxdtIndex] = dxdtSoil;               // Store the current reading in the array
+  dxdtIndex = (dxdtIndex + 1) % numReadings5;       // Move to the next index, cycling through the array
+  totalDxdt = 0;                                    // Calculate the total of all readings
   for (int i = 0; i < numReadings5; i++) { 
-    totalDxdt += dxdtReadings[i]; }
+    totalDxdt += dxdtReadings[i]; 
+  }
+  float avgDeltaSoil = totalDxdt / numReadings5;    // Calculate the average Humidity value
 
-  // Calculate the average Humidity value
-  float avgDeltaSoil = totalDxdt / numReadings5;
-
-  // Average Soil value
-
-  // Store the current reading in the array
-  soilReadings[soilIndex] = soil;
-  soilIndex = (soilIndex + 1) % numReadings1;  // Move to the next index, cycling through the array
-
-  // Calculate the total of all readings
-  totalSoil = 0;
+  //.......Average Soil value.......
+  
+  soilReadings[soilIndex] = soil;                   // Store the current reading in the array
+  soilIndex = (soilIndex + 1) % numReadings1;       // Move to the next index, cycling through the array
+  totalSoil = 0;                                    // Calculate the total of all readings
   for (int i = 0; i < numReadings1; i++) { 
-    totalSoil += soilReadings[i]; }
+    totalSoil += soilReadings[i]; 
+  }
+  int averageSoil = totalSoil / numReadings1;       // Calculate the average soil value
 
-  // Calculate the average soil value
-  int averageSoil = totalSoil / numReadings1;
-
-  // Average Temp
-
-  // Store the current reading in the array
-  tempReadings[tempIndex] = t;
-  tempIndex = (tempIndex + 1) % numReadings2;  // Move to the next index, cycling through the array
-
-  // Calculate the total of all readings
-  totalTemp = 0;
+  //.......Average Temp.......
+  
+  tempReadings[tempIndex] = t;                      // Store the current reading in the array
+  tempIndex = (tempIndex + 1) % numReadings2;       // Move to the next index, cycling through the array  
+  totalTemp = 0;                                    // Calculate the total of all readings
   for (int i = 0; i < numReadings2; i++) { 
-    totalTemp += tempReadings[i]; }
+    totalTemp += tempReadings[i]; 
+  }
+  float averageTemp = totalTemp / numReadings2;     // Calculate the average Temperature value
 
-  // Calculate the average Temperature value
-  float averageTemp = totalTemp / numReadings2;
+  //.......Average Humidity.......
 
-  // Average Humidity
-
-  // Store the current reading in the array
-  humidReadings[humidIndex] = h;
-  humidIndex = (humidIndex + 1) % numReadings3;  // Move to the next index, cycling through the array
-
-  // Calculate the total of all readings
-  totalHumid = 0;
+  humidReadings[humidIndex] = h;                    // Store the current reading in the array
+  humidIndex = (humidIndex + 1) % numReadings3;     // Move to the next index, cycling through the array
+  totalHumid = 0;                                   // Calculate the total of all readings
   for (int i = 0; i < numReadings3; i++) { 
-    totalHumid += humidReadings[i]; }
+    totalHumid += humidReadings[i]; 
+  }
+  float averageHumid = totalHumid / numReadings3;   // Calculate the average Humidity value
 
-  // Calculate the average Humidity value
-  float averageHumid = totalHumid / numReadings3;
+  //.......Average Heat Index.......
 
-  // Average Heat Index
-
-  // Store the current reading in the array
-  hiReadings[hiIndex] = hic;
-  hiIndex = (hiIndex + 1) % numReadings4;  // Move to the next index, cycling through the array
-
-  // Calculate the total of all readings
-  totalHi = 0;
+  hiReadings[hiIndex] = hic;                        // Store the current reading in the array
+  hiIndex = (hiIndex + 1) % numReadings4;           // Move to the next index, cycling through the array
+  totalHi = 0;                                      // Calculate the total of all readings
   for (int i = 0; i < numReadings4; i++) { 
-    totalHi += hiReadings[i]; }
+    totalHi += hiReadings[i]; 
+  }
+  float averageHI = totalHi / numReadings4;         // Calculate the average Humidity value
 
-  // Calculate the average Humidity value
-  float averageHI = totalHi / numReadings4;
-
-  // dS/dt - detects changing value, avoids triggering when counting on startup
+  //.......dS/dt....... - detects changing value, avoids triggering when counting on startup
 
   int deltaSoil = averageSoil;  // int analogAverage = analogRead(A0); if only one sensor used !
 
-  prevSoil = newSoil;  // Saves soil level read from previous cycle
+  prevSoil = newSoil;           // Saves soil level read from previous cycle
   newSoil = deltaSoil;
-
-  previousTime2 = newTime2;  // Saves the time of the previous cycle
-  newTime2 = millis();       // Filling up/down(+/-)  /  cycle runtime  -  (millis() / 100)
+  previousTime2 = newTime2;     // Saves the time of the previous cycle
+  newTime2 = millis();    
 
   float dsdt = abs((newSoil - prevSoil) / (newTime2 - previousTime2));
+
 
 //...................Button functions....................................................
 
@@ -725,7 +701,6 @@ void loop() {
       digitalWrite(relay,  LOW); }
   }
 
-  
   void displayMessage(const char* line1, const char* line2) {
     lcd.clear();
     lcd.setCursor(0, 0);
