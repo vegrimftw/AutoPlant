@@ -76,7 +76,7 @@ DHT dht(DHTPIN, DHTTYPE);
   void purpleLED(int blinkInterval = -1);
   void whiteLED(int blinkInterval = -1);
 
-//...................Average for-loops...................................................
+//...................Average calculations................................................
 
   // numReadings is the amount of sensor data readings being averaged out
 
@@ -206,13 +206,13 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.print("Forgetful people");
   redLED();  // Test each LED color on startup
-  delay(1000);
-  greenLED();
-  delay(1000);
-  blueLED();
-  delay(1000);
-  noLED();
   delay(500);
+  greenLED();
+  delay(500);
+  blueLED();
+  delay(500);
+  noLED();
+  delay(250); 
 
   if (toggleSwitch == HIGH)  // One soil sensor - One white blink at startup
   {
@@ -242,7 +242,7 @@ void loop() {
 //...................More Variables......................................................
 
   int timer       = interval * seconds;    // Timer for disabling the pump if ON too long
-  int yLoops      = longPress * 2;         // One for-loop is 500ms
+  int yLoops      = longPress * 4;         // 4x because one for-loop = 250ms 
 
   // Limits
   int safetyLim   = triggerStart * 1.5;    // Pump cannot be activated above this %
@@ -380,7 +380,7 @@ void loop() {
     lcd.clear();
 
     // Read and display data while checking if the button is held down
-    for (int i = 0; i < (20 - y); i++) {
+    for (int i = 0; i < (40 - y); i++) {
       readAndDisplayData();
 
       if (digitalRead(button) == HIGH) {
@@ -396,7 +396,7 @@ void loop() {
 
         for (y = 0; y < yLoops; y++) {
           readAndDisplayData();
-          delay(420);
+          delay(240);
 
           if (y == (yLoops - 1)) {
             buttonHeldLongEnough = true;
@@ -417,7 +417,7 @@ void loop() {
           }
         }
       }
-      delay(500);
+      delay(250);
     }
   }
 
