@@ -56,9 +56,9 @@ DHT dht(DHTPIN, DHTTYPE);
   int totalClick;
   int clickStatus[12];
   int triggerstart;  // Used for serial input
-
   int prevSoil;
   int newSoil;
+
   double dxSoil;
   double deltaSoil;
   double prevSoilRaw;
@@ -120,7 +120,6 @@ DHT dht(DHTPIN, DHTTYPE);
     B00011,
     B00000,
   };
-
   byte topLeft[8] = {
     B00000,
     B00000,
@@ -131,7 +130,6 @@ DHT dht(DHTPIN, DHTTYPE);
     B00110,
     B01101,
   };
-
   byte topRight[8] = {
     B00000,
     B00000,
@@ -142,7 +140,6 @@ DHT dht(DHTPIN, DHTTYPE);
     B01100,
     B00110,
   };
-
   byte bottomLeft[8] = {
     B01101,
     B01100,
@@ -153,7 +150,6 @@ DHT dht(DHTPIN, DHTTYPE);
     B00000,
     B00000,
   };
-
   byte bottomRight[8] = {
     B10110,
     B00110,
@@ -200,6 +196,7 @@ void setup() {
 
   Serial.println(F(" AutoPlant - For forgetful/lazy people"));
   Serial.println(F(" Initializing..."));
+  lcd.setCursor(0, 0);
   lcd.print(" AutoWater for  ");
   lcd.setCursor(0, 1);
   lcd.print("Forgetful people");
@@ -211,7 +208,7 @@ void setup() {
   delay(500);
   noLED();
   delay(250); 
-
+  
   if (toggleSwitch == HIGH) {     // One soil sensor - One white blink at startup
     whiteLED();
     delay(1000);
@@ -254,7 +251,7 @@ void loop() {
 
   int soil1_raw = analogRead(A1);                    // Reads the analog value
   int soil1 = map(soil1_raw, mapLo, mapHi, 100, 0);  // Converts it to percentage
-
+  
   int soil2_raw = analogRead(A2);
   int soil2 = map(soil2_raw, mapLo, mapHi, 100, 0);
 
@@ -291,6 +288,7 @@ void loop() {
   dxdtReadings[dxdtIndex] = dxdtSoil;               // Store the current reading in the array
   dxdtIndex = (dxdtIndex + 1) % numReadings5;       // Move to the next index, cycling through the array
   totalDxdt = 0;                                    // Calculate the total of all readings
+  
   for (int i = 0; i < numReadings5; i++) { 
     totalDxdt += dxdtReadings[i]; 
   }
@@ -301,6 +299,7 @@ void loop() {
   soilReadings[soilIndex] = soil;                   // Store the current reading in the array
   soilIndex = (soilIndex + 1) % numReadings1;       // Move to the next index, cycling through the array
   totalSoil = 0;                                    // Calculate the total of all readings
+  
   for (int i = 0; i < numReadings1; i++) { 
     totalSoil += soilReadings[i]; 
   }
@@ -311,6 +310,7 @@ void loop() {
   tempReadings[tempIndex] = t;                      // Store the current reading in the array
   tempIndex = (tempIndex + 1) % numReadings2;       // Move to the next index, cycling through the array  
   totalTemp = 0;                                    // Calculate the total of all readings
+  
   for (int i = 0; i < numReadings2; i++) { 
     totalTemp += tempReadings[i]; 
   }
@@ -321,6 +321,7 @@ void loop() {
   humidReadings[humidIndex] = h;                    // Store the current reading in the array
   humidIndex = (humidIndex + 1) % numReadings3;     // Move to the next index, cycling through the array
   totalHumid = 0;                                   // Calculate the total of all readings
+  
   for (int i = 0; i < numReadings3; i++) { 
     totalHumid += humidReadings[i]; 
   }
@@ -331,6 +332,7 @@ void loop() {
   hiReadings[hiIndex] = hic;                        // Store the current reading in the array
   hiIndex = (hiIndex + 1) % numReadings4;           // Move to the next index, cycling through the array
   totalHi = 0;                                      // Calculate the total of all readings
+  
   for (int i = 0; i < numReadings4; i++) { 
     totalHi += hiReadings[i]; 
   }
@@ -345,8 +347,7 @@ void loop() {
   previousTime2 = newTime2;     // Saves the time of the previous cycle
   newTime2 = millis();    
 
-  float dsdt = abs((newSoil - prevSoil) / (newTime2 - previousTime2));
-
+  float dsdt = abs((newSoil - prevSoil) / (newTime2 - previousTime2)); // d(Sensor)/dt
 
 //...................Button functions....................................................
 
@@ -361,7 +362,6 @@ void loop() {
     // Read and display data while checking if the button is held down
     for (int i = 0; i < (40 - y); i++) {
       readAndDisplayData();
-
       if (digitalRead(button) == HIGH) {
         lcd.setCursor(7, 0);
         lcd.write(1);
@@ -372,18 +372,16 @@ void loop() {
         lcd.setCursor(8, 1);
         lcd.write(4);
         delay(50);
-
         for (y = 0; y < yLoops; y++) {
           readAndDisplayData();
           delay(240);
-
           if (y == (yLoops - 1)) {
             buttonHeldLongEnough = true;
             greenLED();
             delay(250);
             break;
           }
-            if (digitalRead(button) == LOW) {
+          if (digitalRead(button) == LOW) {
             buttonHeldLongEnough = false;
             lcd.setCursor(7, 0);
             lcd.print("  ");
@@ -398,10 +396,9 @@ void loop() {
       delay(250);
     }
   }
-
   if ((buttonHeldLongEnough == true) && (soil <= safetyLim)) {
     startWatering();
-  }
+  } 
   buttonHeldLongEnough = false;  // Reset after watering starts
 
   //.................Adjust trigger value......................
@@ -418,7 +415,7 @@ void loop() {
     lcd.print(triggerStart);
     lcd.setCursor(15, 1);
     lcd.print("%");
-    delay (500);   // avoids multiple inputs 
+    delay (1000);   // avoids multiple inputs 
   } 
   if (down == HIGH) {
     triggerStart = triggerStart - 1; 
@@ -429,7 +426,7 @@ void loop() {
     lcd.print(triggerStart);
     lcd.setCursor(15, 1);
     lcd.print("%");
-    delay (500); 
+    delay (1000); 
   }
 
 //...................Serial Input........................................................
@@ -439,11 +436,9 @@ void loop() {
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil('\n');
     command.trim();  // Trim whitespace and newline characters
-
     if (command.startsWith("timer ")) {
       String numberString = command.substring(6);  // Extract number part after "timer "
       int newSeconds = numberString.toInt();       // Convert to integer
-
       if (newSeconds > 0) {
         seconds = newSeconds;
         timer = interval * seconds;  // Reset timer with new seconds value
@@ -460,10 +455,9 @@ void loop() {
     if (command.startsWith("trigger ")) {
       String numberString = command.substring(8);  // Extract number part after "trigger "
       int newTrigger = numberString.toInt();       // Convert to integer
-
       if (newTrigger > 0) {
         triggerStart = newTrigger;
-        Serial.print(F("Trigger value updated. Watering will start below "));
+        Serial.print(F("Trigger value updated. Watering will start at "));
         Serial.print(triggerStart);
         Serial.println(F("%"));
       } 
@@ -478,7 +472,6 @@ void loop() {
       pump(on); 
       Serial.println("Pump is ON");
     }
-
     else if (command == "pump off") {
       pump(off); 
       Serial.println("Pump is OFF");
@@ -513,10 +506,10 @@ void loop() {
 //...................LED.................................................................
 
   if (averageTemp < tempLo) {       // If temp is below 22 degrees - blue blink (5Hz)
-    blueLED(100);
+    blueLED(200);
   }
   else if (averageTemp > tempHi) {  // If temp is above 28 degrees - red blink (5Hz)
-    redLED(100);
+    redLED(200);
   }
   else {  // Temperature is good. LED indicates soil moisture status
 
@@ -567,18 +560,13 @@ void loop() {
       Serial.print(analogRead(A0));
       Serial.print(F(",  A2_Raw: "));  // Raw sensor data
       Serial.print(analogRead(A2));
-      //
       Serial.print(F("  -Pump: "));
-
       if (digitalRead(pump) == HIGH) {
         Serial.print(F("ON"));
       } 
       else {
         Serial.print(F("OFF"));
       }
-      Serial.print(F(",  Elapsed time: "));  // Raw sensor data
-      Serial.print(timeElapsed);
-      //
       lcd.setCursor(0, 1);
       lcd.print("DHT Sensor Error");
       lcd.setCursor(0, 0);
@@ -621,7 +609,6 @@ void loop() {
     lcd.setCursor(15, 1);
     lcd.print("%");
   }
-
   else {
     lcd.setCursor(0, 0);                  // LCD 1st row Left - Relative Humidity
     lcd.print("HI:");
@@ -786,7 +773,7 @@ void loop() {
       lcd.print(remainingTime);
       lcd.setCursor(15, 1);
       lcd.print("s");
-
+      
       Serial.print(F("-Soil "));
       Serial.print(soilYo);
       Serial.print(F("%  - "));
@@ -801,10 +788,8 @@ void loop() {
         delay(500);
         return;
       }
-
       delay(checkInterval);  // wait for checkInterval before updating again
     }
-
     pump(off); 
   }
 
@@ -893,7 +878,8 @@ void whiteLED(int blinkInterval = -1) {
     digitalWrite(LED_Red, HIGH);
     digitalWrite(LED_Green, HIGH);
     digitalWrite(LED_Blue, HIGH);
-  } else {
+  } 
+  else {
     digitalWrite(LED_Red, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Green, (millis() / blinkInterval) % 2);
     digitalWrite(LED_Blue, (millis() / blinkInterval) % 2);
