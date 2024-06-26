@@ -10,8 +10,8 @@ Takes care of plants or whatever for people who can't maintain one by themselves
   2. Calibration is required and should be started by commenting out the pump trigger IF statement (line 485-488) 
      This will avoid accidental triggering of the pump. Or just not have the pump connected through the relay yet. 
 
-  3. mapHi and mapLo is the sensor calibration borders. The analog input range is 0-1023, but the soil sensor
-     does not use the entire range (approx 510-180). It should be good, but check and make changes if needed. 
+     - mapHi and mapLo is the sensor calibration borders. The analog input range is 0-1023, but the soil sensor
+       does not use the entire range (approx 510-180). It should be good, but check and make changes if needed. 
   
   4. -The "seconds" variable is the failsafe timer. Default is 45s, but should be changed based on pump effect.
      -The "wateringDuration variable is how long the pump should run if manually activated. Change it to own preference. 
