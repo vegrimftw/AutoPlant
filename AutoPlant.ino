@@ -23,9 +23,9 @@ DHT dht(DHTPIN, DHTTYPE);
 
   // Time(r)
   int seconds          = 45;   // Pump stops after X seconds
-  int longPress        = 3;    // Long press (seconds)
+  int longPress        =  3;   // Long press (seconds)
   int wateringDuration = 30;   // Manual watering duration [seconds]
-  int Hz               = 5;    // Code will cycle 5 times per second 
+  int Hz               =  5;   // Code will cycle 5 times per second 
 
 //...................Inputs/Outputs & Variable...........................................
 
