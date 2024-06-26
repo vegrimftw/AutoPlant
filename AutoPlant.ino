@@ -528,43 +528,35 @@ void loop() {
   // If pump is ON for more than x seconds, pump turns OFF
 
   if (digitalRead(relay) == HIGH) {
-    if (timeElapsed > timer)  // Timer starts counting
-    {
+    if (timeElapsed > timer) {        // Timer starts counting
       pump(off); 
       return;
     }
-  } else {
-    timeElapsed = 0;
-  }  // Resets timer each cycle if pump is off
+  } 
+  else { timeElapsed = 0; }           // Resets timer each cycle if pump is off
 
 //...................LED.................................................................
 
   if (averageTemp < tempLo) {       // If temp is below 22 degrees - blue blink (5Hz)
     blueLED(100);
   }
-
   else if (averageTemp > tempHi) {  // If temp is above 28 degrees - red blink (5Hz)
     redLED(100);
   }
-
   else {  // Temperature is good. LED indicates soil moisture status
 
     if ((averageSoil > soilGreen) && !(avgDeltaSoil > 0.01)) {        // Green light
       greenLED();
     }
-
     else if ((averageSoil > soilYellow) && !(avgDeltaSoil > 0.01)) {  //  Yellow light
       yellowLED();
     }
-
     else if ((averageSoil >= soilRed) && !(avgDeltaSoil > 0.01)) {    //  Red light
       redLED();
     }
-
     else if ((averageSoil < soilRed) && !(avgDeltaSoil > 0.01)) {     // Red blink (2Hz)
       redLED(500);
     }
-
     else if ((averageSoil) < 0 || (averageSoil > 100)) {  // Calibration error, purple blink (1Hz)
       purpleLED(1000);
     }
