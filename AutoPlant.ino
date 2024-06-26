@@ -249,9 +249,9 @@ void loop() {
   int lowerLim    = triggerStart - 10;     // Lower limit
 
   // Soil LED
-  int soilGreen   = triggerStart * 1.45;   // Green above this
+  int soilGreen   = triggerStart * 1.50;   // Green above this
   int soilYellow  = triggerStart * 1.25;   // Yellow Above this
-  int soilRed     = triggerStart * 1.1;    // Red above this
+  int soilRed     = triggerStart * 1.05;   // Red above this
 
 //...................Soil moisture & DHT sensor..........................................
 
