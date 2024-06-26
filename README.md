@@ -26,9 +26,9 @@ Takes care of plants or whatever for people who can't maintain one by themselves
      ..then press ENTER button to send the command. For example: "trigger 45"
 
      The pump can also be started the same way, simply write this:  
-     "pump on" or "pump off"
+     * "pump on" or "pump off"
 
-     * Serial input only works if the Arduino is battery powered or powered by something else than USB. 
+     Serial input only works if the Arduino is battery powered or powered by something else than USB. 
 
 Inputs/Outputs is entirely up to you, this is just how I ended up doing this. I encrourage you to clean up the io's and code a bit. 
 I used two sensors as just one proved to be somewhat unreliable at times. 
