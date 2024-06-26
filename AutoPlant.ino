@@ -405,8 +405,7 @@ void loop() {
             delay(250);
             break;
           }
-
-          if (digitalRead(button) == LOW) {
+            if (digitalRead(button) == LOW) {
             buttonHeldLongEnough = false;
             lcd.setCursor(7, 0);
             lcd.print("  ");
@@ -535,40 +534,33 @@ void loop() {
 
 //...................LED.................................................................
 
-  if (averageTemp < tempLo)  // If temp is below 22 degrees - blue blink (5Hz)
-  {
+  if (averageTemp < tempLo) {       // If temp is below 22 degrees - blue blink (5Hz)
     blueLED(100);
   }
 
-  else if (averageTemp > tempHi)  // If temp is above 28 degrees - red blink (5Hz)
-  {
+  else if (averageTemp > tempHi) {  // If temp is above 28 degrees - red blink (5Hz)
     redLED(100);
   }
 
   else {  // Temperature is good. LED indicates soil moisture status
 
-    if ((averageSoil > soilGreen) && !(avgDeltaSoil > 0.01))  // Green light
-    {
+    if ((averageSoil > soilGreen) && !(avgDeltaSoil > 0.01)) {        // Green light
       greenLED();
     }
 
-    else if ((averageSoil > soilYellow) && !(avgDeltaSoil > 0.01))  //  Yellow light
-    {
+    else if ((averageSoil > soilYellow) && !(avgDeltaSoil > 0.01)) {  //  Yellow light
       yellowLED();
     }
 
-    else if ((averageSoil >= soilRed) && !(avgDeltaSoil > 0.01))  //  Red light
-    {
+    else if ((averageSoil >= soilRed) && !(avgDeltaSoil > 0.01)) {    //  Red light
       redLED();
     }
 
-    else if ((averageSoil < soilRed) && !(avgDeltaSoil > 0.01))  // Red blink (2Hz)
-    {
+    else if ((averageSoil < soilRed) && !(avgDeltaSoil > 0.01)) {     // Red blink (2Hz)
       redLED(500);
     }
 
-    else if ((averageSoil) < 0 || (averageSoil > 100))  // Calibration error, purple blink (1Hz)
-    {
+    else if ((averageSoil) < 0 || (averageSoil > 100)) {  // Calibration error, purple blink (1Hz)
       purpleLED(1000);
     }
   }
