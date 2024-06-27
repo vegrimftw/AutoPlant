@@ -488,12 +488,11 @@ void loop() {
 
   if ((soil1 <= (triggerStart + 5)) && (soil2 <= (triggerStart + 5)) && (averageSoil <= triggerStart) && (averageSoil > lowerLim) && (dsdt < 0.001) && (avgDeltaSoil < 0.01)) {
     pump(on); 
-    delay(50);
   }
 
   // Stops pump if the average soil value exceeds trigger stop value OR both sensors exceeds trigger stop value, whatever comes first.
 
-  if ((averageSoil < lowerLim) || (averageSoil > triggerStop) || ((soil1 > triggerStop) & (soil2 > triggerStop))) {
+  if ((averageSoil < lowerLim) || (averageSoil >= triggerStop) || ((soil1 > triggerStop) & (soil2 > triggerStop))) {
     pump(off); 
   }
 
