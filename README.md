@@ -7,7 +7,7 @@ Takes care of plants or whatever for people who can't maintain one by themselves
 
   1. Install libraries (DHT11/22, LCD and elapsedMillis). 
 
-  2. Calibration is required and should be started by commenting out the pump trigger IF statement (line 485-488) 
+  2. Calibration is required and should be started by commenting out the pump trigger IF statement (line 489-491) 
      This will avoid accidental triggering of the pump. Or just not have the pump connected through the relay yet. 
 
      - mapHi and mapLo is the sensor calibration borders. The analog input range is 0-1023, but the soil sensor
