@@ -197,7 +197,7 @@ void setup() {
   Serial.println(F(" AutoPlant - For forgetful/lazy people"));
   Serial.println(F(" Initializing..."));
   lcd.setCursor(0, 0);
-  lcd.print(" AutoWater for  ");
+  lcd.print(" AutoPlant for  ");
   lcd.setCursor(0, 1);
   lcd.print("Forgetful people");
   redLED();  // Test each LED color on startup
@@ -407,27 +407,31 @@ void loop() {
   int down = digitalRead(buttonDown);
 
   if (up == HIGH) {
-    triggerStart = triggerStart + 1; 
-    lcd.clear(); 
-    lcd.setCursor(0, 0);
-    lcd.print("Pump trigger:");
-    lcd.setCursor(13, 0);
-    lcd.print(triggerStart);
-    lcd.setCursor(15, 1);
-    lcd.print("%");
-    delay (1000);   // avoids multiple inputs 
-  } 
-  if (down == HIGH) {
-    triggerStart = triggerStart - 1; 
-    lcd.clear(); 
-    lcd.setCursor(0, 0);
-    lcd.print("Pump trigger:");
-    lcd.setCursor(13, 0);
-    lcd.print(triggerStart);
-    lcd.setCursor(15, 1);
-    lcd.print("%");
-    delay (1000); 
-  }
+      triggerStart = triggerStart + 1;  
+      lcd.setCursor(0, 0);
+      lcd.print("  Pump trigger  ");
+      lcd.setCursor(0, 1); 
+      lcd.print("value set to: ");
+      lcd.setCursor(13, 1);
+      lcd.print(triggerStart);
+      lcd.setCursor(15, 1);
+      lcd.print("% ");
+      delay (750);   // avoids multiple inputs 
+      return;
+    } 
+    if (down == HIGH) {
+      triggerStart = triggerStart - 1; 
+      lcd.setCursor(0, 0);
+      lcd.print("  Pump trigger  ");
+      lcd.setCursor(0, 1); 
+      lcd.print("value set to: ");
+      lcd.setCursor(13, 1);
+      lcd.print(triggerStart);
+      lcd.setCursor(15, 1);
+      lcd.print("% ");
+      delay (750); 
+      return;
+    }
 
 //...................Serial Input........................................................
 
