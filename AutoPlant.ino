@@ -245,7 +245,7 @@ void loop() {
   // Soil LED
   int soilGreen   = triggerStart * 1.50;   // Green above this
   int soilYellow  = triggerStart * 1.25;   // Yellow Above this
-  int soilRed     = triggerStart * 1.05;   // Red above this
+  int soilRed     = triggerStart;          // Red above this
 
 //...................Soil moisture & DHT sensor..........................................
 
