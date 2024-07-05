@@ -10,7 +10,7 @@ DHT dht(DHTPIN, DHTTYPE);
 //..................User Adjustable Variables..........................................
 
   // Pump triggers
-  int triggerStart     = 40;   // This % will trigger the pump
+  int triggerStart     = 42;   // This % will trigger the pump
   int triggerStop      = 95;   // Pump will stop at this %
 
   // Temperature warning LED
