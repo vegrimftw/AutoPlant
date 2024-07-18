@@ -865,9 +865,9 @@ void tealLED(int blinkInterval = -1) {
 
 void purpleLED(int blinkInterval = -1) {
   if (blinkInterval == -1) {
-    digitalWrite(LED_Red, HIGH);
-    digitalWrite(LED_Green, HIGH);
-    digitalWrite(LED_Blue, LOW);
+    digitalWrite(LED_Red,   HIGH);
+    digitalWrite(LED_Green,  LOW);
+    digitalWrite(LED_Blue,  HIGH);
   } 
   else {
     digitalWrite(LED_Red, (millis() / blinkInterval) % 2);
