@@ -564,7 +564,7 @@ void loop() {
       Serial.print(F(",  A2_Raw: "));  // Raw sensor data
       Serial.print(analogRead(A2));
       Serial.print(F("  -Pump: "));
-      if (digitalRead(pump) == HIGH) {
+      if (digitalRead(relay) == HIGH) {
         Serial.print(F("ON"));
       } 
       else {
@@ -591,7 +591,7 @@ void loop() {
 
 //...................Print sensor data to LCD............................................
 
-  if (digitalRead(pump) == HIGH) {
+  if (digitalRead(relay) == HIGH) {
     lcd.clear();
     lcd.setCursor(0, 0);  
     lcd.print("Watering now!");           // LCD 1st row 
